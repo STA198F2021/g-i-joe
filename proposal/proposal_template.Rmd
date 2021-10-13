@@ -15,32 +15,21 @@ library(dplyr)
 
 # Load Data
 ```{r load-data, message = F}
-glimpse(Drug_Consumption, width = getOption("width"))
+drug <- readr::read_csv("Drug_Consumption.csv")
 ```
 
 # Introduction and Data, including Research Questions
 
-(The introduction should introduce your general research question and your data (where it came from, how it was collected, what are the cases, what are the variables, etc.). Your research questions should be clearly specified. The motivation for your research question should be clear, with citations to relevant literature as appropriate.)
+  The goal of this research is to determine whether or not lower personality scores correlate with more frequent abuse of illegal drugs. Further, how do these trends differ across gender and age lines? A study conducted by Turiano, Nicholas A et al., “Personality and Substance Use in Midlife: Conscientiousness as a Moderator and the Effects of Trait Change,” highlights the cruciality of examining the links between personality and substance abuse, for the former is a prime predictor of the latter across stages of life (Turiano et al., 2012). This dataset amasses figures pertaining to the drug consumption and personality scores of 1885 participants hailing from predominantly white, English speaking countries. The data include observations on both legal and illegal drugs: alcohol, amphetamines, amyl nitrite, benzodiazepine, cannabis, chocolate, cocaine, caffeine, crack, ecstasy, heroin, ketamine, legal highs, LSD, methadone, mushrooms, nicotine, and a class of volatile substance abuse. The various personality traits, neuroticism, extraversion, openness to experience, agreeableness, and conscientiousness, were quantified using the NEO-FFI-R measurement, and impulsivity and sensation seeking attributes were measured using BIS-11 and ImpSS, respectively. The dataset also contains the binary gender identity, age category, ethnicity, country of residence, and educational background of all of the participants. For the purposes of this research project, ethnicity, country of residence, and educational background are likely to be unimportant or unhelpful given that the vast majority are white and the data on education are not readily quantifiable. Further, the primary focus will be on the use, or lack thereof, of illegal drugs and will not qualify the legal drugs as “drug usage."
 
 # Glimpse
 
-(Please use `glimpse` for your data, uploaded into the data folder, here.)
+```{r glimpse}
+glimpse(drug, width = getOption("width"))
+```
+
 
 # Data Analysis Plan
 
-(Specify the outcome (response, Y) and predictor (explanatory, X) variables you will use to answer your question, as well as the comparison groups you will use, if applicable. You may include very preliminary exploratory data analysis, including some summary statistics and visualizations, along with some explanation on how they help you learn more about your data. Note the statistical method(s) that you believe will be useful in answering your question(s). 
-What results from these specific statistical methods are needed to support your hypothesized answer?)
+In order to analyze these data, the drug usage of the various illegal drugs will be considered the outcome variable while the personality scores will be the explanatory variable. Both gender and age categories are additional data that constitute comparison groups to facilitate the answering of the overarching research question and provide compelling juxtapositions. To visualize these trends, a bar plot that has age on the x-axis, drug use on the y-axis, is dodged by gender, and faced by drug type would be helpful to see the relationship between all of these variables. For certain aspects of analyzing the data, it will be useful to modify the data of the drug usage ratings which currently span from 0 to 6 corresponding to never used, used over a decade ago, used in last decade, used in last year, used in last month, used in last week, and used in last day, respectively. A more useful way of grouping the drug usage would be to only use a scale of 0 to 2 that corresponds to never used, used a long time ago, and used in the past month, respectively. Finally, a t-test is a statistical method that will prove very helpful in answering the proposed research question. A t-test can help determine if there is sufficient evidence that lower personality scores lead to higher levels of drug use. The greater the difference between personality scores and drug usage, the greater the support for this hypothesis. 
 
-Y: drug use
-X: personality scores
-comparison groups: gender and age cats
-
-Ideas for visualization:
--bar plot with age on x-axis, dodged by gender, faceted by drug type
-
-To modify data:
--group drug usage ratings (never used, used a long time ago, used in past month)
-
-Stat methods:
--bootstrapped null distribution?
--t-test: is there sufficient evidence that lower personality scores lead to higher levels of drug use?
