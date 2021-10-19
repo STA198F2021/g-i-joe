@@ -9,8 +9,10 @@ output: pdf_document
 # Load Packages
 
 ```{r load-packages, message = FALSE, warning = FALSE}
+install.packages("taRifx")
 library(tidyverse)
 library(dplyr)
+library(taRifx)
 ``` 
 
 # Load Data
@@ -31,5 +33,80 @@ glimpse(drug, width = getOption("width"))
 
 # Data Analysis Plan
 
-In order to analyze these data, the drug usage of the various illegal drugs will be considered the outcome variable while the personality scores will be the explanatory variable. Both gender and age categories are additional data that constitute comparison groups to facilitate the answering of the overarching research question and provide compelling juxtapositions. To visualize these trends, a bar plot that has age on the x-axis, drug use on the y-axis, is dodged by gender, and faced by drug type would be helpful to see the relationship between all of these variables. For certain aspects of analyzing the data, it will be useful to modify the data of the drug usage ratings which currently span from 0 to 6 corresponding to never used, used over a decade ago, used in last decade, used in last year, used in last month, used in last week, and used in last day, respectively. A more useful way of grouping the drug usage would be to only use a scale of 0 to 2 that corresponds to never used, used a long time ago, and used in the past month, respectively. Finally, a t-test is a statistical method that will prove very helpful in answering the proposed research question. A t-test can help determine if there is sufficient evidence that lower personality scores lead to higher levels of drug use. The greater the difference between personality scores and drug usage, the greater the support for this hypothesis. 
+In order to analyze these data, the drug usage of the various illegal drugs will be considered the outcome variable while the personality scores will be the explanatory variable. Both gender and age categories are additional data that constitute comparison groups to facilitate the answering of the overarching research question and provide compelling juxtapositions. To visualize these trends, a bar plot that has age on the x-axis, average drug use on the y-axis, is dodged by gender, and faceted by drug type would be helpful to see the relationship between all of these variables. Finally, an ANOVA model is a statistical method that will prove very helpful in answering the proposed research question. An ANOVA model can help determine if there is sufficient evidence that lower personality scores lead to more frequent illegal drug usage. “Drug usage” is quantified by the average use of each drug based on the rating. In other words, a drug with an average rating of 5 is considered more frequently used than a drug with an average rating of 2. 
+
+
+```{r data_tidying}
+drug1 <- drug %>%
+  mutate(across(Alcohol:VSA,destring))
+```
+
+```{r getting_averages}
+drug1[,14:32] <- sapply(drug1[,14:32],as.numeric)
+drugmeans <- colMeans(drug1[ , 14:32])
+```
+
+```{r new_data_set}
+drug_name <- c('Alcohol', 'Amphet', 'Amyl', 'Benzos', 'Caff', 'Cannabis', 'Choc', 'Coke', 'Crack', 'Ecstasy', 'Heroin', 'Ketamine','Legalh', 'LSD', 'Meth', 'Mushrooms', 'Nicotine', 'VSA')
+average_use <- c(4.63481953, 1.34023355, 0.60721868, 1.46496815, 5.48354565, 2.99097665, 5.10668790, 1.16188960, 0.29777070, 1.31475584, 0.37420382, 0.56953291, 1.35668790, 1.06210191, 0.82696391, 1.18789809, 3.20116773, 0.43365180)
+drug_averages <- data.frame(drug_name, average_use) %>%
+print
+```
+
+```{r visualization}
+drug_averages$drug_name <- factor(drug_averages$drug_name,                                    
+                  levels = drug_averages$drug_name[order(drug_averages$average_use, decreasing = TRUE)])
+ggplot(drug_averages, aes(x=drug_name, y=average_use)) + 
+  geom_bar(stat="identity", width=.5, fill="tomato3") + 
+  labs(title="Average Drug Use by Drug",
+       x = "Drug Name",
+       y = "Average Use") + 
+  theme(axis.text.x = element_text(angle=65, vjust=0.6))
+```
+```{r data_tidying_2}
+num_drug <- drug1 %>%                               
+  mutate(Age = replace(Age, Age == "18-24", 0), Age = replace(Age, Age == "25-34", 1), Age = replace(Age, Age == "35-44", 2), Age = replace(Age, Age == "45-54", 3), Age = replace(Age, Age == "55-64", 4), Age = replace(Age, Age == "65+", 5), Gender = replace(Gender, Gender == "F", 0), Gender = replace(Gender, Gender == "M", 1), Education = replace(Education, Education == "Left school before 16 years", 0), Education = replace(Education, Education == "Left school at 16 years", 1), Education = replace(Education, Education == "Left school at 17 years", 2), Education = replace(Education, Education == "Left school at 18 years", 3), Education = replace(Education, Education == "Some college or university, no certificate or degree", 4), Education = replace(Education, Education == "Professional certificate/ diploma", 5), Education = replace(Education, Education == "University degree", 6), Education = replace(Education, Education == "Masters degree", 7), Education = replace(Education, Education == "Doctorate degree", 8), Country = replace(Country, Country == "Australia", 0), Country = replace(Country, Country == "Canada", 1), Country = replace(Country, Country == "New Zealand", 2), Country = replace(Country, Country == "Other", 3), Country = replace(Country, Country == "Republic of Ireland", 4), Country = replace(Country, Country == "UK", 5), Country = replace(Country, Country == "USA", 6), Ethnicity = replace(Ethnicity, Ethnicity == "Asian", 0), Ethnicity = replace(Ethnicity, Ethnicity == "Black", 1), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-Black/Asian", 2), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-White/Asian", 3), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-White/Black", 4), Ethnicity = replace(Ethnicity, Ethnicity == "Other", 5), Ethnicity = replace(Ethnicity, Ethnicity == "White", 6))
+
+numdrug <- mutate_all(num_drug, function(x) as.numeric(as.character(x)))
+```
+
+```{r heatmap_with_correlations}
+head(numdrug)
+correlation_matrix <- round(cor(numdrug),2)
+head(correlation_matrix)
+
+  get_upper_tri<-function(correlation_matrix){
+    correlation_matrix[lower.tri(correlation_matrix)] <- NA
+    return(correlation_matrix)
+  }
+  upper_tri <- get_upper_tri(correlation_matrix)
+library(reshape2)
+melted_cormat <- melt(upper_tri, na.rm = TRUE)
+library(ggplot2)
+ggplot(data = melted_cormat, aes(Var2, Var1, fill = value))+
+ geom_tile(color = "white")+
+ scale_fill_gradient2(low = "#8a02b2", high = "#560219", mid = "#FAF9F6", 
+   midpoint = 0, limit = c(-1,1), space = "Lab", 
+   name="Correlation (Pearson)") +
+  theme_minimal()+ 
+ theme(axis.text.x = element_text(angle = 60, vjust = 1, 
+    size = 5, hjust = 1), axis.text.y = element_text(vjust = 1, size = 5, hjust = 1))+
+ coord_fixed() + 
+geom_text(aes(Var2, Var1, label = value), color = "black", size = 1) +
+theme(
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.border = element_blank(),
+  panel.background = element_blank(),
+  axis.ticks = element_blank(),
+  legend.justification = c(1, 0),
+  legend.position = c(0.6, 0.7),
+  legend.direction = "horizontal",
+  legend.key.size = unit(0.5, 'cm'))+
+  guides(fill = guide_colorbar(barwidth = 10, barheight = 1,
+                title.position = "top", title.hjust = 0.5))
+```
+
+
 
