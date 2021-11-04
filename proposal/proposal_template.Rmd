@@ -10,9 +10,11 @@ output: pdf_document
 
 ```{r load-packages, message = FALSE, warning = FALSE}
 install.packages("taRifx")
+install.packages("fastDummies")
 library(tidyverse)
 library(dplyr)
 library(taRifx)
+library(fastDummies)
 ``` 
 
 # Load Data
@@ -63,6 +65,11 @@ ggplot(drug_averages, aes(x=drug_name, y=average_use)) +
        y = "Average Use") + 
   theme(axis.text.x = element_text(angle=65, vjust=0.6))
 ```
+Visualization Description:
+This plot shows the relationship between the drugs in our data set and their average use values. To make this plot we created a new dataframe in which the observations for the drug variables are numerical values corresponding to respondents' drug use history: 0 = never used the drug, 1 = used it over a decade ago, 2 = in the last decade, 3 = used in the last year, 4 = used in the last month, 5 = used in the last week, 6 = used in the last day. Then, we found the average values of each drug column and created a bar plot in descending order according to average drug use.
+
+The most commonly used drugs are caffeine, chocolate, alcohol, nicotine, and cannabis. The least commonly used drugs are crack, heroine, VSA, ketamine, and amyl. Semer is not included in the bar plot because it is a fictitious drug only included in the survey to filter out over-claiming survey respondents. 
+
 ```{r data_tidying_2}
 num_drug <- drug1 %>%                               
   mutate(Age = replace(Age, Age == "18-24", 0), Age = replace(Age, Age == "25-34", 1), Age = replace(Age, Age == "35-44", 2), Age = replace(Age, Age == "45-54", 3), Age = replace(Age, Age == "55-64", 4), Age = replace(Age, Age == "65+", 5), Gender = replace(Gender, Gender == "F", 0), Gender = replace(Gender, Gender == "M", 1), Education = replace(Education, Education == "Left school before 16 years", 0), Education = replace(Education, Education == "Left school at 16 years", 1), Education = replace(Education, Education == "Left school at 17 years", 2), Education = replace(Education, Education == "Left school at 18 years", 3), Education = replace(Education, Education == "Some college or university, no certificate or degree", 4), Education = replace(Education, Education == "Professional certificate/ diploma", 5), Education = replace(Education, Education == "University degree", 6), Education = replace(Education, Education == "Masters degree", 7), Education = replace(Education, Education == "Doctorate degree", 8), Country = replace(Country, Country == "Australia", 0), Country = replace(Country, Country == "Canada", 1), Country = replace(Country, Country == "New Zealand", 2), Country = replace(Country, Country == "Other", 3), Country = replace(Country, Country == "Republic of Ireland", 4), Country = replace(Country, Country == "UK", 5), Country = replace(Country, Country == "USA", 6), Ethnicity = replace(Ethnicity, Ethnicity == "Asian", 0), Ethnicity = replace(Ethnicity, Ethnicity == "Black", 1), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-Black/Asian", 2), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-White/Asian", 3), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-White/Black", 4), Ethnicity = replace(Ethnicity, Ethnicity == "Other", 5), Ethnicity = replace(Ethnicity, Ethnicity == "White", 6))
@@ -108,5 +115,51 @@ theme(
                 title.position = "top", title.hjust = 0.5))
 ```
 
+Visualization Description:
+This is a heatmap showing the Pearson Correlation of every variable in the dataframe. To create this plot, we created a new dataframe in which all the observations were assigned numerical values as described below.
 
+Age: 0 = 18-24, 1 = 25-34, 2 = 35-44, 3 = 45-54, 4 = 55-64, 5 = 65+
+  
+Gender: 0 = F, 1 = M
+  
+Education: 0 = Left school before 16 years, 1 = Left school at 16 years, 2 = Left school at 17 years, 3 = Left school at 18 years, 4 = Some college or university, no certificate or degree, 5 = Professional certificate/ diploma, 6 = University degree, 7 = Masters degree, 8 = Doctorate degree
+  
+Country: 0 = Australia, 1 = Canada, 2 = New Zealand, 3 = Other, 4 = Republic of Ireland, 5 = UK, 6 = USA
+  
+Ethincity: 0 = Asian, 1 = Black, 2 = Mixed-Black/Asian, 3 = Mixed-White/Asian, 4 = Mixed-White/Black, 5 = Other, 6 = White
+
+Then, we found the correlation matrix for the given variables. Finally, we created a heatmap visualization to show the general trends in correlation among variables.
+
+Upon reviewing the visualization, we found that benzodiazepine has a strong positive correlated to neuroticism, extraversion is not heavily correlated to any drug, openness to experience is strongly correlated positively to cannabis use, legal highs, LSD use, and mushroom use, agreeableness and conscientiousness are negatively correlated to all drug use (except for chocolate), and sensation seeking and impulsiveness have the strongest positive correlations to the most drugs.
+
+(code snippets for the heatmap were used from: http://www.sthda.com/english/wiki/ggplot2-quick-correlation-matrix-heatmap-r-software-and-data-visualization)
+
+```{r}
+pivoted <- numdrug %>%
+  pivot_longer(cols = Alcohol:VSA,
+               names_to = "drug_name",
+               values_to = "usage_freq")
+```
+
+```{r}
+pivoted_drug <- pivoted %>%
+  pivot_longer(cols = Nscore:SS,
+               names_to = "personality",
+               values_to = "score")
+```
+
+```{r}
+pivoted_drug_byfreq <- pivoted_drug %>%
+  mutate(x = ifelse(usage_freq >= 3, "Freq", ifelse(usage_freq == 0, "Never", "Rare")))
+
+pivoted_drug_byfreq <- pivoted_drug_byfreq %>%
+  dummy_cols(select_columns = c("x"))
+```
+
+Create Density Graph:
+-frequency on x
+-score on y
+-for each drug and score combination
+
+-take out semer, chocolate, caffeine
 
