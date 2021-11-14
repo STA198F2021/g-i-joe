@@ -163,3 +163,50 @@ Create Density Graph:
 
 -take out semer, chocolate, caffeine
 
+```{r}
+ggplot(drug, aes(x = Cannabis, y = Oscore)) +
+  geom_violin() +
+  stat_summary(fun.data = "mean_cl_boot", geom = "pointrange",
+               colour = "red")
+```
+
+```{r}
+ggplot(drug, aes(x = Benzos, y = Nscore)) +
+  geom_violin() +
+  stat_summary(fun.data = "mean_cl_boot", geom = "pointrange",
+               colour = "red")
+```
+```{r}
+drug %>%
+  ggplot(aes(y = Semer, fill = Gender)) +
+  geom_bar(position = "fill") +
+  labs(x="Proportion") + 
+  scale_fill_manual(values=c("#638B27","#BBA2B6"))
+```
+```{r}
+library(ggridges)
+ggplot(drug, aes(x = Oscore, y = Cannabis, fill = Cannabis, color = Cannabis)) + 
+  geom_density_ridges(alpha = 0.5)
+
+library(ggridges)
+ggplot(drug, aes(x = Oscore, y = Legalh, fill = Legalh, color = Legalh)) + 
+  geom_density_ridges(alpha = 0.5)
+
+library(ggridges)
+ggplot(drug, aes(x = Oscore, y = Mushrooms, fill = Mushrooms, color = Mushrooms)) + 
+  geom_density_ridges(alpha = 0.5)
+
+library(ggridges)
+ggplot(drug, aes(x = Oscore, y = LSD, fill = LSD, color = LSD)) + 
+  geom_density_ridges(alpha = 0.5)
+```
+```{r}
+drug_byuse <- drug %>%
+  mutate(
+    cannabis = if_else(Cannabis == "CL0", 0, 1),
+    mushrooms = if_else(Mushrooms == "CL0", 0, 1)
+  )
+```
+
+
+
