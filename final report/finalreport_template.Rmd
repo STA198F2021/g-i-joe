@@ -1,7 +1,266 @@
 ---
 title: "Final Report"
 subtitle: "due November 16, 2021 by 11:59 PM "
-author: "Your names and team name here"
+author: "G.I. Joe: Isa Rundell and Grace Vo"
 date: ""
 output: pdf_document
 ---
+```{r load-packages, message = FALSE, warning = FALSE}
+install.packages("taRifx")
+install.packages("fastDummies")
+library(tidyverse)
+library(dplyr)
+library(taRifx)
+library(fastDummies)
+library(infer)
+library(parsnip)
+``` 
+
+```{r load-data, message = F}
+drug <- readr::read_csv("Drug_Consumption.csv")
+```
+
+Abstract:
+
+Background and Significance:
+
+Methods:
+a) Data Collection and Variables
+
+b) Exploratory Data Analysis
+
+```{r avg-drug-use}
+drug1 <- drug %>%
+  mutate(across(Alcohol:VSA,destring))
+
+drug1[,14:32] <- sapply(drug1[,14:32],as.numeric)
+drugmeans <- colMeans(drug1[ , 14:32])
+
+drug_name <- c('Alcohol', 'Amphet', 'Amyl', 'Benzos', 'Caff', 'Cannabis', 'Choc', 'Coke', 'Crack', 'Ecstasy', 'Heroin', 'Ketamine','Legalh', 'LSD', 'Meth', 'Mushrooms', 'Nicotine', 'VSA')
+average_use <- c(4.63481953, 1.34023355, 0.60721868, 1.46496815, 5.48354565, 2.99097665, 5.10668790, 1.16188960, 0.29777070, 1.31475584, 0.37420382, 0.56953291, 1.35668790, 1.06210191, 0.82696391, 1.18789809, 3.20116773, 0.43365180)
+
+drug_averages <- data.frame(drug_name, average_use)
+
+drug_averages$drug_name <- factor(drug_averages$drug_name,                                    
+                  levels = drug_averages$drug_name[order(drug_averages$average_use, decreasing = TRUE)])
+ggplot(drug_averages, aes(x=drug_name, y=average_use)) + 
+  geom_bar(stat="identity", width=.5, fill="#560219") + 
+  labs(title="Average Drug Use by Drug",
+       x = "Drug Name",
+       y = "Average Use") + 
+  theme(axis.text.x = element_text(angle=65, vjust=0.6))
+```
+```{r heatmap}
+numdrug <- drug1 %>%                               
+  mutate(Age = replace(Age, Age == "18-24", 0), Age = replace(Age, Age == "25-34", 1), Age = replace(Age, Age == "35-44", 2), Age = replace(Age, Age == "45-54", 3), Age = replace(Age, Age == "55-64", 4), Age = replace(Age, Age == "65+", 5), Gender = replace(Gender, Gender == "F", 0), Gender = replace(Gender, Gender == "M", 1), Education = replace(Education, Education == "Left school before 16 years", 0), Education = replace(Education, Education == "Left school at 16 years", 1), Education = replace(Education, Education == "Left school at 17 years", 2), Education = replace(Education, Education == "Left school at 18 years", 3), Education = replace(Education, Education == "Some college or university, no certificate or degree", 4), Education = replace(Education, Education == "Professional certificate/ diploma", 5), Education = replace(Education, Education == "University degree", 6), Education = replace(Education, Education == "Masters degree", 7), Education = replace(Education, Education == "Doctorate degree", 8), Country = replace(Country, Country == "Australia", 0), Country = replace(Country, Country == "Canada", 1), Country = replace(Country, Country == "New Zealand", 2), Country = replace(Country, Country == "Other", 3), Country = replace(Country, Country == "Republic of Ireland", 4), Country = replace(Country, Country == "UK", 5), Country = replace(Country, Country == "USA", 6), Ethnicity = replace(Ethnicity, Ethnicity == "Asian", 0), Ethnicity = replace(Ethnicity, Ethnicity == "Black", 1), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-Black/Asian", 2), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-White/Asian", 3), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-White/Black", 4), Ethnicity = replace(Ethnicity, Ethnicity == "Other", 5), Ethnicity = replace(Ethnicity, Ethnicity == "White", 6))
+
+numdrug <- mutate_all(numdrug, function(x) as.numeric(as.character(x)))
+
+head(numdrug)
+correlation_matrix <- round(cor(numdrug),2)
+head(correlation_matrix)
+
+  get_upper_tri<-function(correlation_matrix){
+    correlation_matrix[lower.tri(correlation_matrix)] <- NA
+    return(correlation_matrix)
+  }
+  upper_tri <- get_upper_tri(correlation_matrix)
+library(reshape2)
+melted_cormat <- melt(upper_tri, na.rm = TRUE)
+library(ggplot2)
+ggplot(data = melted_cormat, aes(Var2, Var1, fill = value))+
+ geom_tile(color = "white")+
+ scale_fill_gradient2(low = "#8a02b2", high = "#560219", mid = "#FAF9F6", 
+   midpoint = 0, limit = c(-1,1), space = "Lab", 
+   name="Correlation (Pearson)") +
+  theme_minimal()+ 
+ theme(axis.text.x = element_text(angle = 60, vjust = 1, 
+    size = 5, hjust = 1), axis.text.y = element_text(vjust = 1, size = 5, hjust = 1))+
+ coord_fixed() + 
+geom_text(aes(Var2, Var1, label = value), color = "black", size = 1) +
+theme(
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.border = element_blank(),
+  panel.background = element_blank(),
+  axis.ticks = element_blank(),
+  legend.justification = c(1, 0),
+  legend.position = c(0.6, 0.7),
+  legend.direction = "horizontal",
+  legend.key.size = unit(0.5, 'cm'))+
+  guides(fill = guide_colorbar(barwidth = 10, barheight = 1,
+                title.position = "top", title.hjust = 0.5))
+```
+```{r}
+drug_clean <- numdrug %>%
+  mutate(Alcohol_User = as.factor(ifelse(Alcohol > 1, "yes", "no")), 
+         Amphetamine_User = as.factor(ifelse(Amphet > 1, "yes", "no")), 
+         AmylNitrite_User = as.factor(ifelse(Amyl > 1, "yes", "no")),
+         Benzos_User = as.factor(ifelse(Benzos > 1, "yes", "no")),
+         Caffeine_User = as.factor(ifelse(Caff > 1, "yes", "no")), 
+         Cannabis_User = as.factor(ifelse(Cannabis > 1, "yes", "no")), 
+         Chocolate_User = as.factor(ifelse(Choc > 1, "yes", "no")), 
+         Cocaine_User = as.factor(ifelse(Coke > 1, "yes", "no")), 
+         Crack_User = as.factor(ifelse(Crack > 1, "yes", "no")), 
+         Ecstasy_User = as.factor(ifelse(Ecstasy > 1, "yes", "no")), 
+         Heroine_User = as.factor(ifelse(Heroin > 1, "yes", "no")), 
+         Ketamine_User = as.factor(ifelse(Ketamine > 1, "yes", "no")), 
+         LegalHighs_User = as.factor(ifelse(Legalh > 1, "yes", "no")), 
+         LSD_User = as.factor(ifelse(LSD > 1, "yes", "no")), 
+         Meth_User = as.factor(ifelse(Meth > 1, "yes", "no")), 
+         Mushrooms_User = as.factor(ifelse(Mushrooms > 1, "yes", "no")),
+         Nicotine_User = as.factor(ifelse(Nicotine > 1, "yes", "no")),
+         Semeron_User = as.factor(ifelse(Semer > 1, "yes", "no")), 
+         VSA_User = as.factor(ifelse(VSA > 1, "yes", "no")))
+
+drug_clean_2 <- drug1 %>%
+    mutate(Alcohol_User = as.factor(ifelse(Alcohol > 1, "yes", "no")), 
+         Amphetamine_User = as.factor(ifelse(Amphet > 1, "yes", "no")), 
+         AmylNitrite_User = as.factor(ifelse(Amyl > 1, "yes", "no")),
+         Benzos_User = as.factor(ifelse(Benzos > 1, "yes", "no")),
+         Caffeine_User = as.factor(ifelse(Caff > 1, "yes", "no")), 
+         Cannabis_User = as.factor(ifelse(Cannabis > 1, "yes", "no")), 
+         Chocolate_User = as.factor(ifelse(Choc > 1, "yes", "no")), 
+         Cocaine_User = as.factor(ifelse(Coke > 1, "yes", "no")), 
+         Crack_User = as.factor(ifelse(Crack > 1, "yes", "no")), 
+         Ecstasy_User = as.factor(ifelse(Ecstasy > 1, "yes", "no")), 
+         Heroine_User = as.factor(ifelse(Heroin > 1, "yes", "no")), 
+         Ketamine_User = as.factor(ifelse(Ketamine > 1, "yes", "no")), 
+         LegalHighs_User = as.factor(ifelse(Legalh > 1, "yes", "no")), 
+         LSD_User = as.factor(ifelse(LSD > 1, "yes", "no")), 
+         Meth_User = as.factor(ifelse(Meth > 1, "yes", "no")), 
+         Mushrooms_User = as.factor(ifelse(Mushrooms > 1, "yes", "no")),
+         Nicotine_User = as.factor(ifelse(Nicotine > 1, "yes", "no")),
+         Semeron_User = as.factor(ifelse(Semer > 1, "yes", "no")), 
+         VSA_User = as.factor(ifelse(VSA > 1, "yes", "no")))
+```
+
+
+```{r diff-in-user-and-nonuser}
+drug_byuse <- numdrug %>%
+  mutate(Alcohol_User = ifelse(Alcohol > 1, 1, 0), 
+         Amphetamine_User = ifelse(Amphet > 1, 1, 0), 
+         AmylNitrite_User = ifelse(Amyl > 1, 1, 0),
+         Benzos_User = ifelse(Benzos > 1, 1, 0),
+         Caffeine_User = ifelse(Caff > 1, 1, 0), 
+         Cannabis_User = ifelse(Cannabis > 1, 1, 0), 
+         Chocolate_User = ifelse(Choc > 1, 1, 0), 
+         Cocaine_User = ifelse(Coke > 1, 1, 0), 
+         Crack_User = ifelse(Crack > 1, 1, 0), 
+         Ecstasy_User = ifelse(Ecstasy > 1, 1, 0), 
+         Heroine_User = ifelse(Heroin > 1, 1, 0), 
+         Ketamine_User = ifelse(Ketamine > 1, 1, 0), 
+         LegalHighs_User = ifelse(Legalh > 1, 1, 0), 
+         LSD_User = ifelse(LSD > 1, 1, 0), 
+         Meth_User = ifelse(Meth > 1, 1, 0), 
+         Mushrooms_User = ifelse(Mushrooms > 1, 1, 0),
+         Nicotine_User = ifelse(Nicotine > 1, 1, 0),
+         Semeron_User = ifelse(Semer > 1, 1, 0), 
+         VSA_User = ifelse(VSA > 1, 1, 0)) %>%
+  dplyr::select(Alcohol_User, Amphetamine_User, AmylNitrite_User, Benzos_User,
+                Caffeine_User, Cannabis_User, Chocolate_User, Cocaine_User, 
+                Crack_User, Ecstasy_User, Heroine_User, Ketamine_User, 
+                LegalHighs_User, LSD_User, Meth_User, Mushrooms_User, 
+                Nicotine_User, Semeron_User, VSA_User)
+
+  
+data.frame(yes = colSums(drug_byuse), no = 1885 - colSums(drug_byuse), 
+           drug = colnames(drug_byuse)) %>%
+  summarise(diff = abs(yes - no), drug = drug) %>%
+  arrange(diff) %>%
+  head()
+```
+
+c) Analytical Methods
+
+```{r benzos-vs-gender}
+drug_clean_2 %>%
+  ggplot(aes(x = Gender,
+             fill = Benzos_User)) +
+  geom_bar()
+```
+
+```{r fisher-test-for-gender}
+fisher.test(drug_clean_2$Gender, drug_clean_2$Benzos_User)
+```
+-Since the p-value is less than the significance level, gender is statistically significant.
+
+```{r benzos-vs-country}
+drug_clean_2 %>%
+  ggplot(aes(x = Country,
+             fill = Benzos_User)) +
+  geom_bar()
+```
+
+```{r x-squared-test-for-country}
+#null_distribution_simulated <- drug_clean_2 %>%
+  #specify(Country ~ Benzos_User) %>%
+  #hypothesize(null = "independence") %>%
+  #generate(reps = 5000, type = "permute") %>%
+  #calculate(stat = "Chisq")
+
+#null_distribution_simulated %>%
+  #visualize(method = "both") + 
+  #shade_p_value(observed_chisq_statistic,
+                #direction = "greater")
+```
+
+```{r benzos-vs-education}
+drug_clean %>%
+  ggplot(aes(x = Education,
+             fill = Benzos_User)) +
+  geom_bar()
+
+drug_clean %>%
+  ggplot(aes(x = Education,
+             fill = Benzos_User)) +
+  geom_bar(position = "fill")
+```
+
+```{r benzos-vs-age}
+drug_clean_2 %>%
+  ggplot(aes(x = Age,
+             fill = Benzos_User)) +
+  geom_bar()
+
+drug_clean_2 %>%
+  ggplot(aes(x = Age, 
+             fill = Benzos_User)) +
+  geom_bar(position = "fill") 
+```
+
+```{r benzos-vs-nscore}
+drug_clean %>%
+  ggplot(aes(Benzos_User, Nscore)) + 
+  geom_boxplot() + 
+  geom_jitter(width = 0.1, alpha = 0.1)
+```
+
+```{r benzos-vs-oscore}
+drug_clean %>%
+  ggplot(aes(Benzos_User, Oscore)) + 
+  geom_boxplot() + 
+  geom_jitter(width = 0.1, alpha = 0.1)
+```
+
+```{r benzos-vs-impulsiveness}
+drug_clean %>%
+  ggplot(aes(Benzos_User, Impulsive)) + 
+  geom_boxplot() + 
+  geom_jitter(width = 0.1, alpha = 0.1)
+```
+
+```{r logistic-reg}
+fit_multi <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(Benzos_User ~ Gender + Age + Education + Nscore + Oscore + Impulsive + SS, data=drug_clean_2, family="binomial")
+result<-tidy(fit_multi, conf.int=TRUE, exponentiate=TRUE)
+print(result, n=20)
+```
+
+Results:
+
+Discussion:
+
+References:
