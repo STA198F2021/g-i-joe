@@ -51,13 +51,15 @@ ggplot(drug_averages, aes(x=drug_name, y=average_use)) +
   theme(axis.text.x = element_text(angle=65, vjust=0.6))
 ```
 ```{r heatmap}
-numdrug <- drug1 %>%                               
+numdrug <- drug1 %>%
   mutate(Age = replace(Age, Age == "18-24", 0), Age = replace(Age, Age == "25-34", 1), Age = replace(Age, Age == "35-44", 2), Age = replace(Age, Age == "45-54", 3), Age = replace(Age, Age == "55-64", 4), Age = replace(Age, Age == "65+", 5), Gender = replace(Gender, Gender == "F", 0), Gender = replace(Gender, Gender == "M", 1), Education = replace(Education, Education == "Left school before 16 years", 0), Education = replace(Education, Education == "Left school at 16 years", 1), Education = replace(Education, Education == "Left school at 17 years", 2), Education = replace(Education, Education == "Left school at 18 years", 3), Education = replace(Education, Education == "Some college or university, no certificate or degree", 4), Education = replace(Education, Education == "Professional certificate/ diploma", 5), Education = replace(Education, Education == "University degree", 6), Education = replace(Education, Education == "Masters degree", 7), Education = replace(Education, Education == "Doctorate degree", 8), Country = replace(Country, Country == "Australia", 0), Country = replace(Country, Country == "Canada", 1), Country = replace(Country, Country == "New Zealand", 2), Country = replace(Country, Country == "Other", 3), Country = replace(Country, Country == "Republic of Ireland", 4), Country = replace(Country, Country == "UK", 5), Country = replace(Country, Country == "USA", 6), Ethnicity = replace(Ethnicity, Ethnicity == "Asian", 0), Ethnicity = replace(Ethnicity, Ethnicity == "Black", 1), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-Black/Asian", 2), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-White/Asian", 3), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-White/Black", 4), Ethnicity = replace(Ethnicity, Ethnicity == "Other", 5), Ethnicity = replace(Ethnicity, Ethnicity == "White", 6))
 
 numdrug <- mutate_all(numdrug, function(x) as.numeric(as.character(x)))
 
-head(numdrug)
-correlation_matrix <- round(cor(numdrug),2)
+numdrug2 = select(numdrug, -Alcohol, -Amphet, -Amyl, -Benzos, -Caff, -Cannabis, -Choc, -Coke, -Crack, -Ecstasy, -Heroin, -Ketamine, -Legalh, -LSD, -Meth, -Nicotine, -VSA, -Semer)
+
+head(numdrug2)
+correlation_matrix <- round(cor(numdrug2),2)
 head(correlation_matrix)
 
   get_upper_tri<-function(correlation_matrix){
@@ -174,79 +176,112 @@ data.frame(yes = colSums(drug_byuse), no = 1885 - colSums(drug_byuse),
 
 c) Analytical Methods
 
-```{r benzos-vs-gender}
+```{r mushrooms-vs-gender}
 drug_clean_2 %>%
   ggplot(aes(x = Gender,
-             fill = Benzos_User)) +
+             fill = Mushrooms_User)) +
   geom_bar()
 ```
 
 ```{r fisher-test-for-gender}
-fisher.test(drug_clean_2$Gender, drug_clean_2$Benzos_User)
+fisher.test(drug_clean_2$Gender, drug_clean_2$Mushrooms_User)
 ```
 -Since the p-value is less than the significance level, gender is statistically significant.
 
-```{r benzos-vs-country}
+```{r mushrooms-vs-country}
 drug_clean_2 %>%
   ggplot(aes(x = Country,
-             fill = Benzos_User)) +
-  geom_bar()
-```
-
-```{r x-squared-test-for-country}
-#null_distribution_simulated <- drug_clean_2 %>%
-  #specify(Country ~ Benzos_User) %>%
-  #hypothesize(null = "independence") %>%
-  #generate(reps = 5000, type = "permute") %>%
-  #calculate(stat = "Chisq")
-
-#null_distribution_simulated %>%
-  #visualize(method = "both") + 
-  #shade_p_value(observed_chisq_statistic,
-                #direction = "greater")
-```
-
-```{r benzos-vs-education}
-drug_clean %>%
-  ggplot(aes(x = Education,
-             fill = Benzos_User)) +
+             fill = Mushrooms_User)) +
   geom_bar()
 
-drug_clean %>%
-  ggplot(aes(x = Education,
-             fill = Benzos_User)) +
+drug_clean_2 %>%
+  ggplot(aes(x = Country,
+             fill = Mushrooms_User)) +
   geom_bar(position = "fill")
 ```
 
-```{r benzos-vs-age}
+
+```{r mushrooms-vs-education}
+drug_clean %>%
+  ggplot(aes(x = Education,
+             fill = Mushrooms_User)) +
+  geom_bar()
+
+drug_clean %>%
+  ggplot(aes(x = Education,
+             fill = Mushrooms_User)) +
+  geom_bar(position = "fill")
+```
+
+```{r mushrooms-vs-age}
 drug_clean_2 %>%
   ggplot(aes(x = Age,
-             fill = Benzos_User)) +
+             fill = Mushrooms_User)) +
   geom_bar()
 
 drug_clean_2 %>%
   ggplot(aes(x = Age, 
-             fill = Benzos_User)) +
+             fill = Mushrooms_User)) +
   geom_bar(position = "fill") 
+```
+```{r mushrooms-vs-ethnicity}
+drug_clean_2 %>%
+  ggplot(aes(x = Ethnicity,
+             fill = Mushrooms_User)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, 
+    size = 10, hjust = 1), axis.text.y = element_text(vjust = 1, size = 5, hjust = 1))
+
+drug_clean_2 %>%
+  ggplot(aes(x = Ethnicity, 
+             fill = Mushrooms_User)) +
+  geom_bar(position = "fill") +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, 
+    size = 10, hjust = 1), axis.text.y = element_text(vjust = 1, size = 5, hjust = 1))
 ```
 
 ```{r benzos-vs-nscore}
 drug_clean %>%
-  ggplot(aes(Benzos_User, Nscore)) + 
+  ggplot(aes(Mushrooms_User, Nscore)) + 
   geom_boxplot() + 
-  geom_jitter(width = 0.1, alpha = 0.1)
+  geom_jitter(width = 0.1, alpha = 0.1) 
 ```
 
 ```{r benzos-vs-oscore}
 drug_clean %>%
-  ggplot(aes(Benzos_User, Oscore)) + 
+  ggplot(aes(Mushrooms_User, Oscore)) + 
   geom_boxplot() + 
   geom_jitter(width = 0.1, alpha = 0.1)
 ```
 
 ```{r benzos-vs-impulsiveness}
 drug_clean %>%
-  ggplot(aes(Benzos_User, Impulsive)) + 
+  ggplot(aes(Mushrooms_User, Impulsive)) + 
+  geom_boxplot() + 
+  geom_jitter(width = 0.1, alpha = 0.1)
+```
+```{r benzos-vs-ss}
+drug_clean %>%
+  ggplot(aes(Mushrooms_User, SS)) + 
+  geom_boxplot() + 
+  geom_jitter(width = 0.1, alpha = 0.1)
+```
+
+```{r benzos-vs-AScore}
+drug_clean %>%
+  ggplot(aes(Mushrooms_User, AScore)) + 
+  geom_boxplot() + 
+  geom_jitter(width = 0.1, alpha = 0.1)
+```
+```{r benzos-vs-Escore}
+drug_clean %>%
+  ggplot(aes(Mushrooms_User, Escore)) + 
+  geom_boxplot() + 
+  geom_jitter(width = 0.1, alpha = 0.1)
+```
+```{r benzos-vs-Cscore}
+drug_clean %>%
+  ggplot(aes(Mushrooms_User, Cscore)) + 
   geom_boxplot() + 
   geom_jitter(width = 0.1, alpha = 0.1)
 ```
@@ -254,7 +289,7 @@ drug_clean %>%
 ```{r logistic-reg}
 fit_multi <- logistic_reg() %>%
   set_engine("glm") %>%
-  fit(Benzos_User ~ Gender + Age + Education + Nscore + Oscore + Impulsive + SS, data=drug_clean_2, family="binomial")
+  fit(Benzos_User ~ Gender + Age + Education + Nscore + Oscore + Impulsive + SS + Cscore + AScore + Escore, data=drug_clean_2, family="binomial")
 result<-tidy(fit_multi, conf.int=TRUE, exponentiate=TRUE)
 print(result, n=20)
 ```
