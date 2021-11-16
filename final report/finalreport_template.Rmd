@@ -194,7 +194,6 @@ fisher.test(drug_clean_2$Gender, drug_clean_2$Mushrooms_User)
 -Since the p-value is less than the significance level, gender is statistically significant.
 
 ```{r mushrooms-vs-country, echo = FALSE}
-
 country <- ggplot(drug_clean_2, aes(x = Country,
              fill = Mushrooms_User)) +
   geom_bar() +
@@ -224,9 +223,8 @@ gridExtra::grid.arrange(country, country2, nrow = 1)
 ```{r mushrooms-vs-education, echo = FALSE}
 level_order <- factor(drug_clean_2$Education, level = c('Left school before 16 years', 'Left school at 16 years', 'Left school at 17 years', 'Left school at 18 years', 'Some college or university, no certificate or degree', 'University degree', 'Masters degree', 'Professional certificate/ diploma', 'Doctorate degree'))
 
-drug_clean_2 %>%
-  filter(Education != "NA") %>%
-  ggplot(aes(x = level_order,
+
+education <- ggplot(drug_clean_2, aes(x = level_order,
              fill = Mushrooms_User)) +
   geom_bar() +
   labs(x="Education Level",
@@ -234,11 +232,9 @@ drug_clean_2 %>%
        fill = "Mushrooms User") + 
   scale_fill_manual(values=c("#8a02b2","#560219")) +
   theme(axis.text.x = element_text(angle = 40, vjust = 1, 
-    size = 6, hjust = 1), axis.text.y = element_text(vjust = 1, size = 8, hjust = 1))
+    size = 6, hjust = 1), axis.text.y = element_text(vjust = 1, size = 8, hjust = 1)) 
 
-drug_clean_2 %>%
-  filter(Education != "NA") %>%
-  ggplot(aes(x = level_order,
+education2 <- ggplot(drug_clean_2, aes(x = level_order,
              fill = Mushrooms_User)) +
   geom_bar(position = "fill")  +
   labs(x="Education Level",
@@ -247,11 +243,13 @@ drug_clean_2 %>%
   scale_fill_manual(values=c("#8a02b2","#560219")) +
   theme(axis.text.x = element_text(angle = 40, vjust = 1, 
     size = 6, hjust = 1), axis.text.y = element_text(vjust = 1, size = 8, hjust = 1))
+
+gridExtra::grid.arrange(education, education2, nrow = 1)
 ```
 
 ```{r mushrooms-vs-age, echo = FALSE}
-drug_clean_2 %>%
-  ggplot(aes(x = Age,
+
+age <- ggplot(drug_clean_2, aes(x = Age,
              fill = Mushrooms_User)) +
   geom_bar() +
   labs(x="Age Group",
@@ -259,18 +257,20 @@ drug_clean_2 %>%
        fill = "Mushrooms User") + 
   scale_fill_manual(values=c("#8a02b2","#560219")) 
 
-drug_clean_2 %>%
-  ggplot(aes(x = Age, 
+
+age2 <- ggplot(drug_clean_2, aes(x = Age, 
              fill = Mushrooms_User)) +
   geom_bar(position = "fill") +
   labs(x="Age Group",
        title="Mushroom User by Age",
        fill = "Mushrooms User") + 
   scale_fill_manual(values=c("#8a02b2","#560219")) 
+
+gridExtra::grid.arrange(age, age2, nrow = 1)
 ```
 ```{r mushrooms-vs-ethnicity, echo = FALSE}
-drug_clean_2 %>%
-  ggplot(aes(x = Ethnicity,
+
+ethnicity <- ggplot(drug_clean_2, aes(x = Ethnicity,
              fill = Mushrooms_User)) +
   geom_bar()  +
   labs(x="Ethnicity",
@@ -280,8 +280,8 @@ drug_clean_2 %>%
   theme(axis.text.x = element_text(angle = 40, vjust = 1, 
     size = 6, hjust = 1), axis.text.y = element_text(vjust = 1, size = 8, hjust = 1))
 
-drug_clean_2 %>%
-  ggplot(aes(x = Ethnicity, 
+
+ethnicity2 <- ggplot(drug_clean_2, aes(x = Ethnicity, 
              fill = Mushrooms_User)) +
   geom_bar(position = "fill") +
   labs(x="Ethnicity",
@@ -290,58 +290,8 @@ drug_clean_2 %>%
   scale_fill_manual(values=c("#8a02b2","#560219")) +
   theme(axis.text.x = element_text(angle = 40, vjust = 1, 
     size = 6, hjust = 1), axis.text.y = element_text(vjust = 1, size = 8, hjust = 1))
-```
 
-
-```{r mushrooms-box-plots, echo = FALSE}
-ggplot(drug_clean, aes(Mushrooms_User, Nscore)) + 
-  geom_boxplot() + 
-  geom_jitter(width = 0.1, alpha = 0.1) +
-  labs(title="Nscore", 
-       subtitle="Neuroticism",
-       x="Mushrooms User")
-
-ggplot(drug_clean, aes(Mushrooms_User, Escore)) + 
-  geom_boxplot() + 
-  geom_jitter(width = 0.1, alpha = 0.1) +
-  labs(title="Escore", 
-       subtitle="Extraversion",
-       x="Mushrooms User")
-
-ggplot(drug_clean, aes(Mushrooms_User, Oscore)) + 
-  geom_boxplot() + 
-  geom_jitter(width = 0.1, alpha = 0.1) +
-  labs(title="Oscore", 
-       subtitle="Openness to experience",
-       x="Mushrooms User")
-
-ggplot(drug_clean, aes(Mushrooms_User, AScore)) + 
-  geom_boxplot() + 
-  geom_jitter(width = 0.1, alpha = 0.1) +
-  labs(title="Ascore", 
-       subtitle="Agreeableness",
-       x="Mushrooms User")
-
-ggplot(drug_clean, aes(Mushrooms_User, Cscore)) + 
-  geom_boxplot() + 
-  geom_jitter(width = 0.05, alpha = 0.05) +
-  labs(title="Cscore", 
-       subtitle="Conscientiousness",
-       x="Mushrooms User")
-
-ggplot(drug_clean, aes(Mushrooms_User, Impulsive)) + 
-  geom_boxplot() + 
-  geom_jitter(width = 0.1, alpha = 0.1) +
-  labs(title="Impulsive", 
-       subtitle="Impulsiveness",
-       x="Mushrooms User")
-
-ggplot(drug_clean, aes(Mushrooms_User, SS)) + 
-  geom_boxplot() + 
-  geom_jitter(width = 0.1, alpha = 0.1) +
-  labs(title="SS", 
-       subtitle="Sensation Seeking",
-       x="Mushrooms User")
+gridExtra::grid.arrange(ethnicity, ethnicity2, nrow = 1)
 ```
 
 
