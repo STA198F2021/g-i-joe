@@ -34,23 +34,39 @@ drug <- read.csv(file = "Drug_Consumption.csv")
 library(lemon)
 knit_print.data.frame <- lemon_print
 ```
-Abstract
+__Abstract__
+
 This paper investigates which factors are linked to psilocybin use, more commonly referred to as magic mushrooms. This data set comes from a repository at the University of California at Irvine and amasses figures pertaining to the consumption of 18 legal and illegal drugs and scores across 7 personality traits of 1885 participants hailing from predominantly white, English speaking countries. We chose to focus on the relationship between the various personality scores, gender, ethnicity, education, age, country of residence and mushroom use. We hypothesize that participants identifying as white males that live in the United States and are in the youngest age group, ages 18-24, with an education status of “attended some college or university but have no certificate or degree” will exhibit the highest average mushroom use. Further, with regards to personality scores, we hypothesize that the sensation seeking personality is the most positively correlated to mushroom use. We concluded that 1) male gender, age category 18-24 years, and an education status of “attended some college or university but have no certificate or degree” are all the most statistically significant indicators of mushroom use, and 2) openness to experience is the personality trait that has the greatest statistically significant correlation to mushroom use.
 
-Background and Significance
+
+__Background and Significance__
+
 The usage of drugs, ranging from the legal and rarely immediately dangerous to one’s health to the illegal and sometimes life-threatening, is driven by various motivations with consequences and repercussions of varying degrees. According to the Australian Alcohol and Drug Foundation, mushrooms, specifically, are consumed for their hallucinogenic effects that can temporarily “trigger changes in perception, mood and thought.” As with any drug, there are inherent risks associated with the decision to use mushrooms, and a study conducted by Nicholas Turiano et al., “Personality and Substance Use in Midlife: Conscientiousness as a Moderator and the Effects of Trait Change,” highlights the cruciality of examining the links between personality and substance abuse, for the former is a prime predictor of the latter across stages of life (Turiano et al., 2012). We are interested in the ways in which the personality traits neuroticism, extraversion, openness to experience, agreeableness, and conscientiousness, impulsivity, and sensation seeking may or may not influence or be correlated to more frequent mushroom use. Additionally, we are interested in examining whether any particular demographics, for example, age, gender, education status, or country of residence, might have a similar significant correlation to mushroom use. The United States Drug Enforcement Administration (DEA) classifies mushrooms as a schedule I substance which is defined as “[a drug] with no currently accepted medical use and a high potential for abuse,” therefore, a deeper understanding of such interrelationships can better inform what demographics or personalities may require preventive health measures to avoid psychological dependence or potential drug abuse given the high risk mushrooms possess.
 
-Data
+
+__Data__
+
 These data were collected in the United Kingdom between March 2011 and March 2012 using an online survey and were subsequently donated to the University of California at Irvine in 2016. The data include observations on both legal and illegal drugs: alcohol, amphetamines, amyl nitrite, benzodiazepine, cannabis, chocolate, cocaine, caffeine, crack, ecstasy, heroin, ketamine, legal highs, LSD, methadone, mushrooms, nicotine, and a class of volatile substance abuse. The various personality traits, neuroticism, extraversion, openness to experience, agreeableness, and conscientiousness, were quantified using the NEO-FFI-R measurement, and impulsivity and sensation seeking attributes were measured using BIS-11 and ImpSS, respectively. The dataset also contains the binary gender identity, age category, ethnicity, country of residence, and educational background of all of the participants.
 
-Methods
-a) Data Collection and Variables
-The original dataset has seven ratings for drug use: never used, used over a decade ago, used in last decade, used in last year, used in last month, used in last week, and used in last day. In order to streamline the data, we created new classifications of user and non-user in which “never used” and “used over a decade ago” are considered “non-user” and all other ratings are considered “user.” Additionally, we created a new dataframe, assigning numerical values to all observations as described below:
 
-#variables and numerical values go here
+__Methods__
 
-b) Exploratory Data Analysis
+_Data Collection and Variables_
 
+The original dataset has seven ratings for drug use: never used, used over a decade ago, used in last decade, used in last year, used in last month, used in last week, and used in last day. In order to streamline the data, we created new classifications of user and non-user in which “never used” and “used over a decade ago” are considered “non-user” and all other ratings are considered “user.” Additionally, we created a new dataframe, assigning numerical values to all variables as described below:
+
+Age: 0 = 18-24, 1 = 25-34, 2 = 35-44, 3 = 45-54, 4 = 55-64, 5 = 65+
+  
+Gender: 0 = F, 1 = M
+  
+Education: 0 = Left school before 16 years, 1 = Left school at 16 years, 2 = Left school at 17 years, 3 = Left school at 18 years, 4 = Some college or university, no certificate or degree, 5 = Professional certificate/ diploma, 6 = University degree, 7 = Masters degree, 8 = Doctorate degree
+  
+Country: 0 = Australia, 1 = Canada, 2 = New Zealand, 3 = Other, 4 = Republic of Ireland, 5 = UK, 6 = USA
+  
+Ethnicity: 0 = Asian, 1 = Black, 2 = Mixed-Black/Asian, 3 = Mixed-White/Asian, 4 = Mixed-White/Black, 5 = Other, 6 = White
+
+
+_Exploratory Data Analysis_
 ```{r avg-drug-use, echo = FALSE, fig.height = 2, fig.width = 3}
 drug1 <- drug %>%
   mutate(across(Alcohol:VSA,destring))
@@ -73,7 +89,8 @@ ggplot(drug_averages, aes(x=drug_name, y=average_use)) +
   theme(axis.text.x = element_text(angle=65, vjust=0.6),
         text=element_text(size=7))
 ```
-Before narrowing down the data to examine solely the use of mushrooms, we compared the average use of all drugs included in the data. The bar graph illustrates legal drugs like chocolate and caffeine as the most frequently used by participants in the dataset with use declining as the drugs become illegal and inherently more dangerous to one’s health.
+
+Figure 1: Before narrowing down the data to examine solely the use of mushrooms, we compared the average use of all drugs included in the data. The bar graph illustrates legal drugs like chocolate and caffeine as the most frequently used by participants in the dataset with use declining as the drugs become illegal and inherently more dangerous to one’s health.
 
 ```{r, echo = FALSE}
 numdrug <- drug1 %>%
@@ -164,9 +181,15 @@ diffdata <- data.frame(yes = colSums(drug_byuse), no = 1885 - colSums(drug_byuse
 ```{r results='asis',render=normal_print, echo = FALSE}
 kable(head(diffdata),caption='Difference in Number of Users and Non-Users by Drug')
 ```
-This table reports the difference between user and non-user by drug in order to get a better sense of which drugs are better represented in the data which helped inform which drug we chose for further analysis, mushrooms.
 
+Table 1: This table reports the difference between user and non-user by drug in order to get a better sense of which drugs are better represented in the data which helped inform which drug we chose for further analysis, mushrooms.
+
+Figure 2: Correlation Matrix
 ```{r heatmap, echo = FALSE, fig.height = 4, fig.width = 4}
+numdrug <- drug1 %>%
+  mutate(Age = replace(Age, Age == "18-24", 0), Age = replace(Age, Age == "25-34", 1), Age = replace(Age, Age == "35-44", 2), Age = replace(Age, Age == "45-54", 3), Age = replace(Age, Age == "55-64", 4), Age = replace(Age, Age == "65+", 5), Gender = replace(Gender, Gender == "F", 0), Gender = replace(Gender, Gender == "M", 1), Education = replace(Education, Education == "Left school before 16 years", 0), Education = replace(Education, Education == "Left school at 16 years", 1), Education = replace(Education, Education == "Left school at 17 years", 2), Education = replace(Education, Education == "Left school at 18 years", 3), Education = replace(Education, Education == "Some college or university, no certificate or degree", 4), Education = replace(Education, Education == "Professional certificate/ diploma", 5), Education = replace(Education, Education == "University degree", 6), Education = replace(Education, Education == "Masters degree", 7), Education = replace(Education, Education == "Doctorate degree", 8), Country = replace(Country, Country == "Australia", 0), Country = replace(Country, Country == "Canada", 1), Country = replace(Country, Country == "New Zealand", 2), Country = replace(Country, Country == "Other", 3), Country = replace(Country, Country == "Republic of Ireland", 4), Country = replace(Country, Country == "UK", 5), Country = replace(Country, Country == "USA", 6), Ethnicity = replace(Ethnicity, Ethnicity == "Asian", 0), Ethnicity = replace(Ethnicity, Ethnicity == "Black", 1), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-Black/Asian", 2), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-White/Asian", 3), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-White/Black", 4), Ethnicity = replace(Ethnicity, Ethnicity == "Other", 5), Ethnicity = replace(Ethnicity, Ethnicity == "White", 6))
+numdrug <- mutate_all(numdrug, function(x) as.numeric(as.character(x)))
+numdrug2 = select(numdrug, -Alcohol, -Amphet, -Amyl, -Benzos, -Caff, -Cannabis, -Choc, -Coke, -Crack, -Ecstasy, -Heroin, -Ketamine, -Legalh, -LSD, -Meth, -Nicotine, -VSA, -Semer)
 #head(numdrug2)
 correlation_matrix <- round(cor(numdrug2),2)
 #head(correlation_matrix)
@@ -202,37 +225,49 @@ theme(
   guides(fill = guide_colorbar(barwidth = 10, barheight = 1,
                 title.position = "top", title.hjust = 0.5))
 ```
-This correlation matrix summarizes the data by allowing us to compare at a quick glance the correlation coefficients between the variables of interest which allowed us to select certain relationships to analyze further to see if the correlations were in fact statistically significant or not.
 
-c) Analytical Methods
 
-#after reviewing the visualizations for the demographics and personality traits and determining which traits are more linked to mushroom use...
+Figure 2: This correlation matrix summarizes the data by allowing us to compare at a quick glance the correlation coefficients between the variables of interest which allowed us to select certain relationships to analyze further to see if the correlations were in fact statistically significant or not.
+
+
+_Analytical Methods_
+
 
 ```{r fisher-test-for-gender, echo = FALSE}
 fisher.test(drug_clean_2$Gender, drug_clean_2$Mushrooms_User)
 ```
 
-We conducted Fisher's exact test evaluating the null hypothesis that the average mushroom use among males is equal to than among females. We also fit logistic regression models to see if the odds ratio estimates for the relationships that we predicted would be most strongly correlated were indeed significantly significant.
+We conducted Fisher's exact test evaluating the null hypothesis that the average mushroom use among males is equal to than among females.
 
-We also fit logistic regression models to see if the odds ratio estimates for the relationships that we predicted would be most strongly correlated were indeed significantly significant.
+We also fit logistic regression models (Appendix 3) to see whether or not the odds ratio estimates for the relationships that we predicted would be most strongly correlated to mushroom use were statistically significant.
 
-Results
-In evaluating the correlations between demographics and personalities in relation to mushroom usage, we used a significance level of alpha = 0.05 for any statistical tests conducted.
 
-First research question: For which personalities is there a significant correlation with mushroom use, positive or negative?
-We created density plots as a means to visualize whether there was a positive, negative, or no correlation between personality scores and mushroom use which can be seen in Appendix #. A higher neuroticism, openness, impulsiveness, and sensation seeking score all appear to correlate positively with more frequent mushroom usage. These positive correlations were all deemed statistically significant based on a fitted logistic regression model, Appendix #, which presents the respective odds ratio estimates of each personality score alongside the p-values of less than 0.05 on a 95% confidence interval. 
+__Results__
 
-Second research question: For which demographic observations, not including ethnicity, is there a significant correlation to mushroom use?
-We used segmented bar charts in order to visualize any relationships between the various demographic data—gender, country of residence, education status, age category—and mushroom use. The table # illustrates that males are 2.96 times the odds to use mushrooms compared to women. Table # reveals that for ages 25-64, the odds ratio estimate of less than 1 is statistically significant and indicates that the odds of using mushrooms is less in this age group in relation to those 18-24 years old. Similarly, table # shows that “left school at 18 years” is the only education status whose odd ratio estimate of less than 1 is not statistically significant compared to those of the status “some college or university, no certificate or degree.” For all education statuses except “left school at 18 years,” the odds of using mushrooms is significantly less in relation to those of “some college or university, no certificate or degree.” Table # shows that New Zealand is the only country of residence whose odd ratio estimate of less than 1 is not statistically significant compared to those living in the U.S. For all countries of residence except New Zealand, the odds of using mushrooms is significantly less in relation to those living in the U.S.
+In evaluating the correlations between demographics and personalities in relation to mushroom usage, we used a significance level of $\alpha$ = 0.05 for any statistical tests conducted.
 
-Discussion
-To further expand upon this analysis of the data, we may want to see if there are similar or contrasting trends apparent among other drugs present in the dataset. In what ways would these correlations stay the same or differ for drugs that are inherently “more dangerous?” Additionally, it would be interesting to explore if there are any demographic or personality score correlations among those who reported using the fictitious drug, semer, that was included in the collection of the data with the intent of identifying people who over-claim on drug usage. 
 
-With regards to the reliability and validity of this data, it is important to consider the inherent flaws of the self-reporting method which was used to obtain data on individuals drug usage frequency. There is also a disproportionate representation among ethnicity and country of residence given that the majority of the participants are white and live in the UK which does not allow any generalizations to be made based on these findings and ethnicity or country of residence. Additionally, it should be noted that the data are skewed toward the younger age categories and that there is less representation among older age groups. 
+_First research question: For which personalities is there a significant correlation with mushroom use, positive or negative?_
+
+We created density plots as a means to visualize whether there was a positive, negative, or no correlation between personality scores and mushroom use which can be seen in Appendix 2, Figure 12. Higher neuroticism, openness to experience, and sensation seeking scores all appear to correlate positively with more frequent mushroom usage. These positive correlations were all deemed statistically significant based on a fitted logistic regression model, Appendix 3, Table 6, which presents the respective odds ratio estimates of each personality score alongside the p-values of less than 0.05 on a 95% confidence interval. 
+
+
+_Second research question: For which demographic observations, not including ethnicity, is there a significant correlation to mushroom use?_ 
+
+We used segmented bar charts in order to visualize any relationships between mushroom use and the various demographic data: gender, country of residence, education status, age category. Appendix 3, Table 2 illustrates that males are 2.96 times the odds to use mushrooms compared to women. Appendix 3, Table 3 reveals that for ages 25-64, the odds ratio estimate of less than 1 is statistically significant indicating that the odds of using mushrooms is less for 25-64 year olds in relation to 18-24 year olds. Similarly, Appendix 3, Table 4 shows that “left school at 18 years” is the only education status whose odds ratio estimate of less than 1 is not statistically significant compared to those of the status “some college or university, no certificate or degree.” For all education statuses except “left school at 18 years,” the odds of using mushrooms is significantly less in relation to those of “some college or university, no certificate or degree.” Appendix 3, Table 5 shows that New Zealand is the only country of residence whose odds ratio estimate of less than 1 is not statistically significant compared to those living in the USA. For all countries of residence except New Zealand, the odds of using mushrooms is significantly less in relation to those living in the USA.
+
+
+__Discussion__
+
+To further expand upon this analysis of the data, we may want to see if there are similar or contrasting trends apparent among other drugs present in the dataset. In what ways would these correlations stay the same or differ for drugs that are inherently “more dangerous?” Additionally, it would be interesting to explore if there are any demographic or personality score correlations among those who reported using the fictitious drug, semeron, that was included in the collection of the data with the intent of identifying people who over-claim on drug usage. 
+
+With regards to the reliability and validity of this data, it is important to consider the inherent flaws of the self-reporting method which was used to obtain data on individuals' drug usage frequency. There is also a disproportionate representation among ethnicity and country of residence given that the majority of the participants are white and live in the UK which does not allow any generalizations to be made based on correlations between mushroom use and ethnicity or country of residence. Additionally, it should be noted that the data are skewed toward the younger age categories and that there is less representation among older age groups. 
 
 In conclusion, we were able to determine which demographic categories and personalities had the greatest statistically significant correlations to mushroom use. We ascertained that males have higher odds of using mushrooms than females, participants 18-24 years old have higher odds of using mushrooms than those between the ages of 25-64, participants who have some college or university education, but no certificate or degree, have higher odds of using mushrooms than all other education statuses except those who left school at age 18, and participants living in the U.S. have higher odds of using mushrooms than those residing in all other countries except New Zealand.
 
-References
+
+__References__
+
 Controlled Substances - alphabetical order. United States Drug Enforcement Administration. (27 August 2021). https://deadiversion.usdoj.gov/schedules/orangebook/c_cs_alpha.pdf.
 
 Drug scheduling. United States Drug Enforcement Administration. https://www.dea.gov/drug-information/drug-scheduling.
@@ -241,12 +276,17 @@ Dua, D. and Graff, C. (2019). UCI Machine Learning Repository. Irvine, CA: Unive
 
 GGPLOT2 : Quick correlation matrix heatmap - R software and Data Visualization. Statistical Tools for High-throughput Data Analysis.
 
-http://www.sthda.com/english/wiki/ggplot2-quick-correlation-matrix-heatmap-r-software-and-data-visualization. Psilocybin (magic mushrooms). Alcohol and Drug Foundation. (10 November 2021).
+http://www.sthda.com/english/wiki/ggplot2-quick-correlation-matrix-heatmap-r-software-and-data-visualization. Psilocybin (magic mushrooms). Alcohol and Drug Foundation. (10 November 2021). https://adf.org.au/drug-facts/psilocybin/.
 
-https://adf.org.au/drug-facts/psilocybin/.
 Turiano, N. A., Whiteman, S. D., Hampson, S. E., Roberts, B. W., & Mroczek, D. K. (2012). Personality and Substance Use in Midlife: Conscientiousness as a Moderator and the Effects of Trait Change. Journal of research in personality, 46(3), 295–305. https://doi.org/10.1016/j.jrp.2012.02.009
 
-Appendices
+
+__Appendices__
+
+
+_Appendix 1_
+
+These bar charts illustrate relations between mushroom use and the demographic observations. For heavily skewed observations, corresponding bar charts with proportion on the y-axis are provided to better view relations.
 
 ```{r mushrooms-vs-gender, echo = FALSE}
 
@@ -451,6 +491,10 @@ knitr::include_graphics(pngfile9)
 ```
 
 
+_Appendix 2_
+
+These density plots represent the average personality scores of mushroom users and non-users.
+
 ```{r trait-density-grid, echo = FALSE, , fig.height = 7, fig.width = 9}
 Nscore.den <- ggplot(drug_clean, aes(Nscore))+
   geom_density(aes(fill=factor(Mushrooms_User)), alpha=0.6, show.legend=F) + 
@@ -503,27 +547,40 @@ SS.den <- ggplot(drug_clean, aes(SS))+
   theme(legend.position = c(3, 0.2)) +
   scale_fill_manual(values=c("#8a02b2","#560219"))
 
-gridExtra::grid.arrange(Nscore.den, Escore.den, Oscore.den, Ascore.den, Cscore.den, Impulsive.den, SS.den, nrow = 3, top = "Figure 12")
+gridExtra::grid.arrange(Nscore.den, Escore.den, Oscore.den, Ascore.den, Cscore.den, Impulsive.den, SS.den, nrow = 3, top = "Figure 12: Average Personality Scores in Mushroom Users and Non-Users")
 ```
 
+
+_Appendix 3_
+
+These logistic regressions show the odds ratio estimates for gender, age, education, country of residence, and personality traits and the corresponding p-values to determine whether such observations were statistically significant. The reference groups for the gender, age, education, and country of residence models were the observations with the highest correlations to mushroom usage.
+
+
+
+Table 2: Gender Odds Ratio Estimates
 ```{r logistic-reg-gender, echo = FALSE}
 drug_clean_2$Gender=relevel(factor(drug_clean_2$Gender), ref = "F")
 fit_multi_gender <- logistic_reg() %>%
   set_engine("glm") %>%
   fit(Mushrooms_User ~ Gender, data=drug_clean_2, family="binomial")
 result1<-tidy(fit_multi_gender, conf.int=TRUE, exponentiate=TRUE)
-print(result1, caption = "Table 2")
+print(result1)
 ```
 
+
+
+Table 3: Age Odds Ratio Estimates
 ```{r logistic-reg-age, echo = FALSE}
 drug_clean_2$Age=relevel(factor(drug_clean_2$Age), ref = "18-24")
 fit_multi_age <- logistic_reg() %>%
   set_engine("glm") %>%
   fit(Mushrooms_User ~ Age, data=drug_clean_2, family="binomial")
-result<-tidy(fit_multi_age, conf.int=TRUE, exponentiate=TRUE)
-print(result, n=25)
+result2<-tidy(fit_multi_age, conf.int=TRUE, exponentiate=TRUE)
+print(result2)
 ```
 
+
+Table 4: Education Odds Ratio Estimates
 ```{r log-reg-edu, echo = FALSE}
 drug_clean_2$Education=relevel(factor(drug_clean_2$Education), ref = "Some college or university, no certificate or degree")
 fit_multi_edu <- logistic_reg() %>%
@@ -534,6 +591,8 @@ print(result3)
 ```
 
 
+
+Table 5: Country Odds Ratio Estimates
 ```{r log-reg-country, echo = FALSE}
 drug_clean_2$Country=relevel(factor(drug_clean_2$Country), ref = "USA")
 fit_multi_country <- logistic_reg() %>%
@@ -544,6 +603,8 @@ print(result4)
 ```
 
 
+
+Table 6: Personality Odds Ratio Estimates
 ```{r logistic-personalities, echo = FALSE}
 fit_multi_personality <- logistic_reg() %>%
   set_engine("glm") %>%
