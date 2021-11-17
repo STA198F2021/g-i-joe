@@ -1,7 +1,6 @@
 ---
-title: "Presentation title"
-subtitle: "Presentation subtitle (if any)"
-author: "Team name <br> Names of team members"
+title: "Exploring personality scores and drug use: factors that contribute to increased use of psilocybin (magic mushrooms)"
+author: 'G.I. Joe: Isa Rundell and Grace Vo'
 institute: "Duke University"
 date: "`r Sys.Date()`"
 output:
@@ -10,22 +9,32 @@ output:
     lib_dir: libs
     nature:
       ratio: "16:9"
-      highlightStyle: github
+      highlightStyle: solarized-light
       highlightLines: true
       countIncrementalSlides: false
 ---
 
-```{r load-packages, include = FALSE}
+```{r load-packages, include = FALSE, echo = FALSE}
 # Add any additional packages you need to this chunk
 # Remove any packages from this list that you're not using
-library(tidyverse)
+install.packages("taRifx")
 library(tidymodels)
-library(palmerpenguins)
-library(knitr)
 library(xaringanthemer)
+library(tidyverse)
+library(knitr)
+library(dplyr)
+library(taRifx)
+library(infer)
+library(parsnip)
+library(tidyr)
+library(reshape2)
+library(ragg)
+library(palmerpenguins)
+library(patchwork)
+library(base)
 ```
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, echo = FALSE}
 # For better figure resolution
 knitr::opts_chunk$set(
   fig.retina = 3, 
@@ -36,166 +45,343 @@ knitr::opts_chunk$set(
   )
 ```
 
-```{r load-data, include=FALSE}
-# Load your data here
+```{r setup1, include=FALSE, echo = FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+```{r load-data, include=FALSE, echo = FALSE}
+drug <- readr::read_csv("Drug_Consumption.csv")
 ```
 
 ```{r style-slides, echo = FALSE}
 style_xaringan(
-  title_slide_background_image = "img/watercolour_sys02_img34_teacup-ocean.jpg"
+  title_slide_background_image = "img/purplemaroon.png"
 )
 ```
 
-class: inverse, middle, center
 
-# Using xaringan
+## Introducing the Data
+
+```{r penguins-table, echo = FALSE}
+kable(head(drug), format = "html")
+```
 
 ---
 
-## xaringan
-
-- The presentation is created using the `xaringan` package
-
-- Use `---` to separate slides and `--` for incremental builds
+## Research Questions
 
 --
 
-- Like this
+- For which personalities is there a significant correlation with mushroom use, positive or negative?
+
+--
+
+- For which demographic observations, not including ethnicity, is there a significant correlation to mushroom use?
 
 ---
+## Correlation Matrix
 
-## Layouts
+```{r heatmap, echo = FALSE}
+drug1 <- drug %>%
+  mutate(across(Alcohol:VSA,destring))
 
-You can use plain text
+drug1[,14:32] <- sapply(drug1[,14:32],as.numeric)
+drugmeans <- colMeans(drug1[ , 14:32])
 
-- or bullet points
-
-.pull-left[
-or text in two columns $^*$
-]
-.pull-right[
-- like
-- this
-]
-
-.footnote[
-[*] And add footnotes
-]
-
----
-
-## Code
-
-```{r boring-regression}
-# a boring regression
-model <- lm(dist ~ speed, data = cars)
-tidy(model)
-glance(model)
+numdrug <- drug1 %>%
+  mutate(Age = replace(Age, Age == "18-24", 0), Age = replace(Age, Age == "25-34", 1), Age = replace(Age, Age == "35-44", 2), Age = replace(Age, Age == "45-54", 3), Age = replace(Age, Age == "55-64", 4), Age = replace(Age, Age == "65+", 5), Gender = replace(Gender, Gender == "F", 0), Gender = replace(Gender, Gender == "M", 1), Education = replace(Education, Education == "Left school before 16 years", 0), Education = replace(Education, Education == "Left school at 16 years", 1), Education = replace(Education, Education == "Left school at 17 years", 2), Education = replace(Education, Education == "Left school at 18 years", 3), Education = replace(Education, Education == "Some college or university, no certificate or degree", 4), Education = replace(Education, Education == "Professional certificate/ diploma", 5), Education = replace(Education, Education == "University degree", 6), Education = replace(Education, Education == "Masters degree", 7), Education = replace(Education, Education == "Doctorate degree", 8), Country = replace(Country, Country == "Australia", 0), Country = replace(Country, Country == "Canada", 1), Country = replace(Country, Country == "New Zealand", 2), Country = replace(Country, Country == "Other", 3), Country = replace(Country, Country == "Republic of Ireland", 4), Country = replace(Country, Country == "UK", 5), Country = replace(Country, Country == "USA", 6), Ethnicity = replace(Ethnicity, Ethnicity == "Asian", 0), Ethnicity = replace(Ethnicity, Ethnicity == "Black", 1), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-Black/Asian", 2), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-White/Asian", 3), Ethnicity = replace(Ethnicity, Ethnicity == "Mixed-White/Black", 4), Ethnicity = replace(Ethnicity, Ethnicity == "Other", 5), Ethnicity = replace(Ethnicity, Ethnicity == "White", 6))
+numdrug <- mutate_all(numdrug, function(x) as.numeric(as.character(x)))
+numdrug2 = select(numdrug, -Alcohol, -Amphet, -Amyl, -Benzos, -Caff, -Cannabis, -Choc, -Coke, -Crack, -Ecstasy, -Heroin, -Ketamine, -Legalh, -LSD, -Meth, -Nicotine, -VSA, -Semer)
+#head(numdrug2)
+correlation_matrix <- round(cor(numdrug2),2)
+#head(correlation_matrix)
+  get_upper_tri<-function(correlation_matrix){
+    correlation_matrix[lower.tri(correlation_matrix)] <- NA
+    return(correlation_matrix)
+  }
+  upper_tri <- get_upper_tri(correlation_matrix)
+library(reshape2)
+melted_cormat <- melt(upper_tri, na.rm = TRUE)
+library(ggplot2)
+ggplot(data = melted_cormat, aes(Var2, Var1, fill = value))+
+ geom_tile(color = "white")+
+ scale_fill_gradient2(low = "#8a02b2", high = "#560219", mid = "#FAF9F6", 
+   midpoint = 0, limit = c(-1,1), space = "Lab", 
+   name="Correlation (Pearson)") +
+  theme_minimal()+ 
+ theme(axis.text.x = element_text(angle = 60, vjust = 1, 
+    size = 10, hjust = 1), axis.text.y = element_text(vjust = 1, size = 10, hjust = 1))+
+ coord_fixed() + 
+geom_text(aes(Var2, Var1, label = value), color = "black", size = 1) +
+theme(
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.border = element_blank(),
+  panel.background = element_blank(),
+  axis.ticks = element_blank(),
+  legend.justification = c(1, 0),
+  legend.position = c(0.75, 0.75),
+  legend.direction = "horizontal",
+  legend.key.size = unit(0.05, 'cm'))+
+  guides(fill = guide_colorbar(barwidth = 9, barheight = 1,
+                title.position = "top", title.hjust = 0.5))
 ```
 
 ---
 
-## Plots
+## Mushroom User by Gender
 
-```{r recode-species, echo = FALSE}
-# In this chunk I'm doing a bunch of analysis that I don't want to present 
-# in my slides. But I need the resulting data frame for a plot I want to present.
-penguins_modified <- penguins %>%
-  mutate(species = fct_other(species, keep = "Adelie"))
+```{r data-tidying, echo = FALSE}
+drug_clean <- numdrug %>%
+  mutate(Alcohol_User = as.factor(ifelse(Alcohol > 1, "yes", "no")), 
+         Amphetamine_User = as.factor(ifelse(Amphet > 1, "yes", "no")), 
+         AmylNitrite_User = as.factor(ifelse(Amyl > 1, "yes", "no")),
+         Benzos_User = as.factor(ifelse(Benzos > 1, "yes", "no")),
+         Caffeine_User = as.factor(ifelse(Caff > 1, "yes", "no")), 
+         Cannabis_User = as.factor(ifelse(Cannabis > 1, "yes", "no")), 
+         Chocolate_User = as.factor(ifelse(Choc > 1, "yes", "no")), 
+         Cocaine_User = as.factor(ifelse(Coke > 1, "yes", "no")), 
+         Crack_User = as.factor(ifelse(Crack > 1, "yes", "no")), 
+         Ecstasy_User = as.factor(ifelse(Ecstasy > 1, "yes", "no")), 
+         Heroine_User = as.factor(ifelse(Heroin > 1, "yes", "no")), 
+         Ketamine_User = as.factor(ifelse(Ketamine > 1, "yes", "no")), 
+         LegalHighs_User = as.factor(ifelse(Legalh > 1, "yes", "no")), 
+         LSD_User = as.factor(ifelse(LSD > 1, "yes", "no")), 
+         Meth_User = as.factor(ifelse(Meth > 1, "yes", "no")), 
+         Mushrooms_User = as.factor(ifelse(Mushrooms > 1, "yes", "no")),
+         Nicotine_User = as.factor(ifelse(Nicotine > 1, "yes", "no")),
+         Semeron_User = as.factor(ifelse(Semer > 1, "yes", "no")), 
+         VSA_User = as.factor(ifelse(VSA > 1, "yes", "no")))
+
+drug_clean_2 <- drug1 %>%
+    mutate(Alcohol_User = as.factor(ifelse(Alcohol > 1, "yes", "no")), 
+         Amphetamine_User = as.factor(ifelse(Amphet > 1, "yes", "no")), 
+         AmylNitrite_User = as.factor(ifelse(Amyl > 1, "yes", "no")),
+         Benzos_User = as.factor(ifelse(Benzos > 1, "yes", "no")),
+         Caffeine_User = as.factor(ifelse(Caff > 1, "yes", "no")), 
+         Cannabis_User = as.factor(ifelse(Cannabis > 1, "yes", "no")), 
+         Chocolate_User = as.factor(ifelse(Choc > 1, "yes", "no")), 
+         Cocaine_User = as.factor(ifelse(Coke > 1, "yes", "no")), 
+         Crack_User = as.factor(ifelse(Crack > 1, "yes", "no")), 
+         Ecstasy_User = as.factor(ifelse(Ecstasy > 1, "yes", "no")), 
+         Heroine_User = as.factor(ifelse(Heroin > 1, "yes", "no")), 
+         Ketamine_User = as.factor(ifelse(Ketamine > 1, "yes", "no")), 
+         LegalHighs_User = as.factor(ifelse(Legalh > 1, "yes", "no")), 
+         LSD_User = as.factor(ifelse(LSD > 1, "yes", "no")), 
+         Meth_User = as.factor(ifelse(Meth > 1, "yes", "no")), 
+         Mushrooms_User = as.factor(ifelse(Mushrooms > 1, "yes", "no")),
+         Nicotine_User = as.factor(ifelse(Nicotine > 1, "yes", "no")),
+         Semeron_User = as.factor(ifelse(Semer > 1, "yes", "no")), 
+         VSA_User = as.factor(ifelse(VSA > 1, "yes", "no")))
 ```
 
-```{r plot-penguins, echo = FALSE, warning = FALSE, fig.alt = "Body mass vs. flipper lenght of Palmer Penguins for species Adelie and all the others combined together. There is a relatively strong, positive relationship between the two variables. The Adelie penguins are clustered together but they don't exhibit a different trend than the rest of the penguins."}
-# Code hidden with echo = FALSE
-# Uses modified penguins dataset from previous chunk
-# Play around with height and width until you're happy with the look
-ggplot(penguins_modified, aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
-  geom_point() + 
-  theme_minimal()
+
+```{r mushrooms-vs-gender, echo = FALSE}
+ggplot(drug_clean_2, aes(x = Gender,
+             fill = Mushrooms_User)) +
+  geom_bar() +
+  labs(x="Gender",
+       y = "Count",
+       title="Figure 3: Mushroom User by Gender",
+       fill = "Mushrooms User") + 
+  scale_fill_manual(values=c("#8a02b2","#560219")) 
 ```
 
 ---
 
-## Plot and text
+## Logistic Regression: Gender
 
-.pull-left[
-- Some text
-- goes here
-]
-.pull-right[
-```{r warning=FALSE, out.width="100%", fig.width=4, echo=FALSE}
-# see how I changed out.width and fig.width from defaults
-# to make the figure bigger
-ggplot(penguins, aes(x = bill_length_mm, y = species, color = species)) +
-  geom_boxplot() +
-  theme_minimal()
-```
-]
-
----
-
-class: inverse, middle, center
-
-# A new section...
-
----
-
-## Tables
-
-If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
-
-```{r penguins-table, echo = FALSE}
-kable(head(penguins), format = "html")
+```{r logistic-reg-gender, echo = FALSE}
+drug_clean_2$Gender=relevel(factor(drug_clean_2$Gender), ref = "F")
+fit_multi_gender <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(Mushrooms_User ~ Gender, data=drug_clean_2, family="binomial")
+result1<-tidy(fit_multi_gender, conf.int=TRUE, exponentiate=TRUE)
+print(result1)
 ```
 
 ---
 
-## Images
+## Mushroom User by Country
 
-```{r castle, echo = FALSE, out.width = "40%", fig.align = "center", fig.cap = "Image credit: Danielle Navarro, Percolate."}
-include_graphics("img/watercolour_sys02_img32_percolate.jpg")
-```
 
-Or you can also include a full page image. See next slide.
-
----
-
-background-image: url(img/watercolour_sys02_img32_percolate.jpg)
-
----
-
-## Math Expressions
-
-You can write LaTeX math expressions inside a pair of dollar signs, e.g. &#36;\alpha+\beta$ renders $\alpha+\beta$. You can use the display style with double dollar signs:
+```{r, echo = FALSE}
+ggplot(drug_clean_2, aes(x = Country,
+             fill = Mushrooms_User)) +
+  geom_bar(position = "fill") +
+  labs(x="Country",
+       y = "Proportion",
+       title="Figure 5: Mushroom User by Country",
+       fill = "Mushrooms User") + 
+  scale_fill_manual(values=c("#8a02b2","#560219")) +
+  theme(axis.text.x = element_text(angle = 40, vjust = 1, 
+    size = 10, hjust = 1), axis.text.y = element_text(vjust = 1, size = 10, hjust = 1))
 
 ```
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
+
+---
+
+
+## Logistic Regression: Country
+
+```{r log-reg-country, echo = FALSE}
+drug_clean_2$Country=relevel(factor(drug_clean_2$Country), ref = "USA")
+fit_multi_country <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(Mushrooms_User ~ Country, data=drug_clean_2, family="binomial")
+result4<-tidy(fit_multi_country, conf.int=TRUE, exponentiate=TRUE)
+print(result4)
 ```
 
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
+---
 
-Limitations:
+## Mushroom User by Education Level
 
-1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
 
-1. There should not be spaces after the opening `$` or before the closing `$`.
+```{r, echo = FALSE}
+level_order <- factor(drug_clean_2$Education, level = c('Left school before 16 years', 'Left school at 16 years', 'Left school at 17 years', 'Left school at 18 years', 'Some college or university, no certificate or degree', 'University degree', 'Masters degree', 'Professional certificate/ diploma', 'Doctorate degree'))
 
-1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
+ggplot(drug_clean_2, aes(x = level_order,
+             fill = Mushrooms_User)) +
+  geom_bar(position = "fill")  +
+  labs(x="Education Level",
+       y = "Proportion",
+       title="Figure 7: Mushroom User by Education Level",
+       fill = "Mushrooms User") + 
+  scale_fill_manual(values=c("#8a02b2","#560219")) +
+  theme(axis.text.x = element_text(angle = 40, vjust = 1, 
+    size = 6, hjust = 1), axis.text.y = element_text(vjust = 1, size = 8, hjust = 1))
+```
+
 
 ---
 
-class: inverse, middle, center
+## Logistic Regression: Education Level
 
-# Wrap up
+
+```{r log-reg-edu, echo = FALSE}
+drug_clean_2$Education=relevel(factor(drug_clean_2$Education), ref = "Some college or university, no certificate or degree")
+fit_multi_edu <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(Mushrooms_User ~ Education, data=drug_clean_2, family="binomial")
+result3<-tidy(fit_multi_edu, conf.int=TRUE, exponentiate=TRUE)
+print(result3)
+```
 
 ---
 
-## Feeling adventurous?
+## Mushroom User by Age
 
-- Want to find out more about `xaringan`? See https://slides.yihui.name/xaringan/#1.
+```{r, echo = FALSE}
+ggplot(drug_clean_2, aes(x = Age, 
+        fill = Mushrooms_User)) +
+  geom_bar(position = "fill") +
+  labs(x="Age Group",
+       y = "Proportion",
+       title="Figure 9: Mushroom User by Age",
+       fill = "Mushrooms User") + 
+  scale_fill_manual(values=c("#8a02b2","#560219")) 
+```
 
-- You are welcomed to use the default styling of the slides. In fact, that's what I expect the majority of you will do. You will differentiate yourself with the content of your presentation.
+---
 
-- But some of you might want to play around with slide styling. The 
-`xaringanthemer` provides some solutions for this that: https://pkg.garrickadenbuie.com/xaringanthemer.
 
-- And if you want more bells and whistles, there is also `xaringanExtra`: https://pkg.garrickadenbuie.com/xaringanExtra.
+## Logistic Regression: Age
+
+```{r logistic-reg-age, echo = FALSE}
+drug_clean_2$Age=relevel(factor(drug_clean_2$Age), ref = "18-24")
+fit_multi_age <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(Mushrooms_User ~ Age, data=drug_clean_2, family="binomial")
+result2<-tidy(fit_multi_age, conf.int=TRUE, exponentiate=TRUE)
+print(result2)
+```
+
+---
+
+
+## Density Plots: average personality scores of mushroom users and non-users
+
+```{r trait-density-grid, echo = FALSE, , fig.height = 7, fig.width = 9}
+Nscore.den <- ggplot(drug_clean, aes(Nscore))+
+  geom_density(aes(fill=factor(Mushrooms_User)), alpha=0.6, show.legend=F) + 
+  labs(title="Nscore", 
+       subtitle="Neuroticism",
+       x="Nscore") +
+  scale_fill_manual(values=c("#8a02b2","#560219")) 
+
+Escore.den <- ggplot(drug_clean, aes(Escore))+
+  geom_density(aes(fill=factor(Mushrooms_User)), alpha=0.6, show.legend=F) + 
+  labs(title="Escore", 
+       subtitle="Extraversion",
+       x="Escore") +
+  scale_fill_manual(values=c("#8a02b2","#560219"))
+
+Oscore.den <- ggplot(drug_clean, aes(Oscore))+
+  geom_density(aes(fill=factor(Mushrooms_User)), alpha=0.6, show.legend=F) + 
+  labs(title="Oscore", 
+       subtitle="Openness to experience",
+       x="Oscore") +
+  scale_fill_manual(values=c("#8a02b2","#560219"))
+
+Ascore.den <- ggplot(drug_clean, aes(AScore))+
+  geom_density(aes(fill=factor(Mushrooms_User)), alpha=0.6, show.legend=F) + 
+  labs(title="Ascore", 
+       subtitle="Agreeableness",
+       x="Ascore") +
+  scale_fill_manual(values=c("#8a02b2","#560219"))
+
+Cscore.den <- ggplot(drug_clean, aes(Cscore))+
+  geom_density(aes(fill=factor(Mushrooms_User)), alpha=0.6, show.legend=F) + 
+  labs(title="Cscore", 
+       subtitle="Conscientiousness",
+       x="Ascore") +
+  scale_fill_manual(values=c("#8a02b2","#560219"))
+
+Impulsive.den <- ggplot(drug_clean, aes(Impulsive))+
+  geom_density(aes(fill=factor(Mushrooms_User)), alpha=0.6, show.legend=F) + 
+  labs(title="Impulsive", 
+       subtitle="Impulsiveness",
+       x="Impulsive") +
+  scale_fill_manual(values=c("#8a02b2","#560219"))
+
+SS.den <- ggplot(drug_clean, aes(SS))+
+  geom_density(aes(fill=factor(Mushrooms_User)), alpha=0.6) + 
+  labs(title="SS", 
+       subtitle="Sensation Seeking",
+       x="SS",
+       fill="Mushrooms Use") +
+  theme(legend.position = c(3, 0.2)) +
+  scale_fill_manual(values=c("#8a02b2","#560219"))
+
+gridExtra::grid.arrange(Nscore.den, Escore.den, Oscore.den, Ascore.den, Cscore.den, Impulsive.den, SS.den, nrow = 3, top = "Figure 12: Average Personality Scores in Mushroom Users and Non-Users")
+```
+
+---
+
+## Odds Ratio Estimates for Personality Traits
+
+```{r logistic-personalities, echo = FALSE}
+fit_multi_personality <- logistic_reg() %>%
+  set_engine("glm") %>%
+  fit(Mushrooms_User ~ Nscore + Oscore + Impulsive + SS + Cscore + AScore + Escore, data=drug_clean_2, family="binomial")
+result5<-tidy(fit_multi_personality, conf.int=TRUE, exponentiate=TRUE)
+print(result5)
+```
+
+---
+
+
+## Conclusions
+
+--
+
+- male gender, age category 18-24 years, an education status of “attended some college or university but have no certificate or degree” are all the most statistically significant indicators of mushroom use
+
+--
+
+- openness to experience is the personality trait that has the greatest statistically significant correlation to mushroom use
+
+---
+

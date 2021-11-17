@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Presentation title</title>
+    <title>Exploring personality scores and drug use: factors that contribute to increased use of psilocybin (magic mushrooms)</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Team name   Names of team members" />
-    <meta name="date" content="2021-10-06" />
-    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <meta name="author" content="G.I. Joe: Isa Rundell and Grace Vo" />
+    <meta name="date" content="2021-11-17" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# Presentation title
-## Presentation subtitle (if any)
-### Team name <br> Names of team members
+# Exploring personality scores and drug use: factors that contribute to increased use of psilocybin (magic mushrooms)
+### G.I. Joe: Isa Rundell and Grace Vo
 ### Duke University
-### 2021-10-06
+### 2021-11-17
 
 ---
 
@@ -29,241 +28,421 @@ class: center, middle, inverse, title-slide
 
 
 
-class: inverse, middle, center
-
-# Using xaringan
-
----
-
-## xaringan
-
-- The presentation is created using the `xaringan` package
-
-- Use `---` to separate slides and `--` for incremental builds
-
---
-
-- Like this
-
----
-
-## Layouts
-
-You can use plain text
-
-- or bullet points
-
-.pull-left[
-or text in two columns `\(^*\)`
-]
-.pull-right[
-- like
-- this
-]
-
-.footnote[
-[*] And add footnotes
-]
-
----
-
-## Code
-
-
-```r
-# a boring regression
-model &lt;- lm(dist ~ speed, data = cars)
-tidy(model)
-```
-
-```
-## # A tibble: 2 × 5
-##   term        estimate std.error statistic  p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-## 1 (Intercept)   -17.6      6.76      -2.60 1.23e- 2
-## 2 speed           3.93     0.416      9.46 1.49e-12
-```
-
-```r
-glance(model)
-```
-
-```
-## # A tibble: 1 × 12
-##   r.squared adj.r.squared sigma statistic  p.value    df logLik   AIC   BIC
-##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-## 1     0.651         0.644  15.4      89.6 1.49e-12     1  -207.  419.  425.
-## # … with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;
-```
-
----
-
-## Plots
 
 
 
-&lt;img src="presentation_files/figure-html/plot-penguins-1.png" title="Body mass vs. flipper lenght of Palmer Penguins for species Adelie and all the others combined together. There is a relatively strong, positive relationship between the two variables. The Adelie penguins are clustered together but they don't exhibit a different trend than the rest of the penguins." alt="Body mass vs. flipper lenght of Palmer Penguins for species Adelie and all the others combined together. There is a relatively strong, positive relationship between the two variables. The Adelie penguins are clustered together but they don't exhibit a different trend than the rest of the penguins." width="70%" /&gt;
-
----
-
-## Plot and text
-
-.pull-left[
-- Some text
-- goes here
-]
-.pull-right[
-&lt;img src="presentation_files/figure-html/unnamed-chunk-1-1.png" width="100%" /&gt;
-]
-
----
-
-class: inverse, middle, center
-
-# A new section...
-
----
-
-## Tables
-
-If you want to generate a table, make sure it is in the HTML format (instead of Markdown or other formats), e.g.,
+## Introducing the Data
 
 &lt;table&gt;
  &lt;thead&gt;
   &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; species &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; island &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; bill_length_mm &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; bill_depth_mm &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; flipper_length_mm &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; body_mass_g &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; sex &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; year &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; ID &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Age &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Gender &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Education &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Country &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Ethnicity &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Nscore &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Escore &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Oscore &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; AScore &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Cscore &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Impulsive &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; SS &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Alcohol &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Amphet &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Amyl &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Benzos &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Caff &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Cannabis &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Choc &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Coke &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Crack &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Ecstasy &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Heroin &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Ketamine &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Legalh &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; LSD &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Meth &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Mushrooms &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Nicotine &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Semer &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; VSA &lt;/th&gt;
   &lt;/tr&gt;
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 39.1 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 18.7 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 181 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3750 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 25-34 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; M &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Doctorate degree &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; UK &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; White &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.67825 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.93886 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.43533 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.76096 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.14277 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.71126 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.21575 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 39.5 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 17.4 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 186 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3800 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 35-44 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; M &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Professional certificate/ diploma &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; UK &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; White &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.46725 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.80523 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.84732 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.62090 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.01450 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.37983 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.40148 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 40.3 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 18.0 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 195 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3250 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 18-24 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; F &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Masters degree &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; UK &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; White &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.14882 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.80615 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.01928 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.59042 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.58489 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.37983 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.18084 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 35-44 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; F &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Doctorate degree &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; UK &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; White &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.73545 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.63340 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.45174 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.30172 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.30612 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.21712 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.21575 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 36.7 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 19.3 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 193 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3450 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 65+ &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; F &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Left school at 18 years &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; White &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.67825 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.30033 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.55521 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.03972 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.63088 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.37983 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.54858 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
   &lt;/tr&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 39.3 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 20.6 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 190 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 3650 &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 45-54 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; M &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Masters degree &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; USA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; White &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.46725 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -1.09207 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.45174 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.30172 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.93949 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -0.21712 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.07987 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; CL0 &lt;/td&gt;
   &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 
 ---
 
-## Images
+## Research Questions
 
-&lt;div class="figure" style="text-align: center"&gt;
-&lt;img src="img/watercolour_sys02_img32_percolate.jpg" alt="Image credit: Danielle Navarro, Percolate." width="40%" /&gt;
-&lt;p class="caption"&gt;Image credit: Danielle Navarro, Percolate.&lt;/p&gt;
-&lt;/div&gt;
+--
 
-Or you can also include a full page image. See next slide.
+- For which personalities is there a significant correlation with mushroom use, positive or negative?
+
+--
+
+- For which demographic observations, not including ethnicity, is there a significant correlation to mushroom use?
+
+---
+## Correlation Matrix
+
+&lt;img src="presentation_files/figure-html/heatmap-1.png" width="70%" /&gt;
 
 ---
 
-background-image: url(img/watercolour_sys02_img32_percolate.jpg)
+## Mushroom User by Gender
+
+
+
+
+&lt;img src="presentation_files/figure-html/mushrooms-vs-gender-1.png" width="70%" /&gt;
 
 ---
 
-## Math Expressions
+## Logistic Regression: Gender
 
-You can write LaTeX math expressions inside a pair of dollar signs, e.g. &amp;#36;\alpha+\beta$ renders `\(\alpha+\beta\)`. You can use the display style with double dollar signs:
 
 ```
-$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$
+## # A tibble: 2 × 7
+##   term        estimate std.error statistic  p.value conf.low conf.high
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)    0.325    0.0757     -14.8 1.03e-49    0.280     0.377
+## 2 GenderM        2.96     0.0999      10.9 1.46e-27    2.44      3.61
 ```
 
-`$$\bar{X}=\frac{1}{n}\sum_{i=1}^nX_i$$`
+---
 
-Limitations:
+## Mushroom User by Country
 
-1. The source code of a LaTeX math expression must be in one line, unless it is inside a pair of double dollar signs, in which case the starting `$$` must appear in the very beginning of a line, followed immediately by a non-space character, and the ending `$$` must be at the end of a line, led by a non-space character;
 
-1. There should not be spaces after the opening `$` or before the closing `$`.
-
-1. Math does not work on the title slide (see [#61](https://github.com/yihui/xaringan/issues/61) for a workaround).
+&lt;img src="presentation_files/figure-html/unnamed-chunk-1-1.png" width="70%" /&gt;
 
 ---
 
-class: inverse, middle, center
 
-# Wrap up
+## Logistic Regression: Country
+
+
+```
+## # A tibble: 7 × 7
+##   term                  estimate std.error statistic  p.value conf.low conf.high
+##   &lt;chr&gt;                    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)              1.96     0.0896     7.53  5.24e-14   1.65       2.34 
+## 2 CountryAustralia         0.509    0.287     -2.35  1.86e- 2   0.290      0.896
+## 3 CountryCanada            0.572    0.233     -2.40  1.62e- 2   0.362      0.904
+## 4 CountryNew Zealand       0.764    0.917     -0.293 7.69e- 1   0.126      5.84 
+## 5 CountryOther             0.625    0.206     -2.29  2.22e- 2   0.418      0.937
+## 6 CountryRepublic of I…    0.218    0.496     -3.07  2.16e- 3   0.0763     0.554
+## 7 CountryUK                0.105    0.122    -18.5   1.05e-76   0.0824     0.133
+```
 
 ---
 
-## Feeling adventurous?
+## Mushroom User by Education Level
 
-- Want to find out more about `xaringan`? See https://slides.yihui.name/xaringan/#1.
 
-- You are welcomed to use the default styling of the slides. In fact, that's what I expect majority of you will do. You will differentiate yourself with the content of your presentation.
+&lt;img src="presentation_files/figure-html/unnamed-chunk-2-1.png" width="70%" /&gt;
 
-- But some of you might want to play around with slide styling. The 
-`xaringanthemer` provides some solutions for this that: https://pkg.garrickadenbuie.com/xaringanthemer.
 
-- And if you want more bells and whistles, there is also `xaringanExtra`: https://pkg.garrickadenbuie.com/xaringanExtra.
+---
+
+## Logistic Regression: Education Level
+
+
+
+```
+## # A tibble: 9 × 7
+##   term                  estimate std.error statistic  p.value conf.low conf.high
+##   &lt;chr&gt;                    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)              1.42     0.0903      3.89 9.94e- 5   1.19       1.70 
+## 2 EducationDoctorate d…    0.231    0.262      -5.60 2.19e- 8   0.136      0.380
+## 3 EducationLeft school…    0.156    0.276      -6.73 1.72e-11   0.0886     0.263
+## 4 EducationLeft school…    0.469    0.383      -1.97 4.84e- 2   0.216      0.985
+## 5 EducationLeft school…    0.704    0.219      -1.60 1.09e- 1   0.457      1.08 
+## 6 EducationLeft school…    0.391    0.405      -2.32 2.03e- 2   0.170      0.848
+## 7 EducationMasters deg…    0.202    0.169      -9.48 2.61e-21   0.144      0.279
+## 8 EducationProfessiona…    0.262    0.164      -8.16 3.45e-16   0.189      0.360
+## 9 EducationUniversity …    0.317    0.134      -8.60 8.25e-18   0.243      0.411
+```
+
+---
+
+## Mushroom User by Age
+
+&lt;img src="presentation_files/figure-html/unnamed-chunk-3-1.png" width="70%" /&gt;
+
+---
+
+
+## Logistic Regression: Age
+
+
+```
+## # A tibble: 6 × 7
+##   term           estimate std.error statistic  p.value conf.low conf.high
+##   &lt;chr&gt;             &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept) 1.33           0.0797    3.58   3.48e- 4   1.14       1.56 
+## 2 Age25-34    0.535          0.122    -5.12   3.07e- 7   0.421      0.679
+## 3 Age35-44    0.205          0.152   -10.4    1.74e-25   0.151      0.275
+## 4 Age45-54    0.125          0.185   -11.2    2.54e-29   0.0863     0.178
+## 5 Age55-64    0.0806         0.360    -7.00   2.52e-12   0.0371     0.155
+## 6 Age65+      0.000000131  343.       -0.0462 9.63e- 1  NA        140.
+```
+
+---
+
+
+## Density Plots: average personality scores of mushroom users and non-users
+
+&lt;img src="presentation_files/figure-html/trait-density-grid-1.png" width="70%" /&gt;
+
+---
+
+## Odds Ratio Estimates for Personality Traits
+
+
+```
+## # A tibble: 8 × 7
+##   term        estimate std.error statistic  p.value conf.low conf.high
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 (Intercept)    0.507    0.0552   -12.3   7.17e-35    0.454     0.564
+## 2 Nscore         0.849    0.0629    -2.60  9.36e- 3    0.750     0.960
+## 3 Oscore         1.89     0.0641     9.97  2.05e-23    1.67      2.15 
+## 4 Impulsive      1.03     0.0739     0.334 7.38e- 1    0.887     1.19 
+## 5 SS             1.87     0.0782     8.00  1.20e-15    1.61      2.18 
+## 6 Cscore         0.764    0.0638    -4.22  2.45e- 5    0.674     0.865
+## 7 AScore         0.895    0.0574    -1.93  5.33e- 2    0.800     1.00 
+## 8 Escore         0.801    0.0650    -3.41  6.41e- 4    0.705     0.909
+```
+
+---
+
+
+## Conclusions
+
+--
+
+- male gender, age category 18-24 years, an education status of “attended some college or university but have no certificate or degree” are all the most statistically significant indicators of mushroom use
+
+--
+
+- openness to experience is the personality trait that has the greatest statistically significant correlation to mushroom use
+
+---
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
 "ratio": "16:9",
-"highlightStyle": "github",
+"highlightStyle": "solarized-light",
 "highlightLines": true,
 "countIncrementalSlides": false
 });
